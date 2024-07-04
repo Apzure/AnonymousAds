@@ -4,9 +4,60 @@
 
 {% block content %}
 <div class="container">
-    <h1> Priv </h1>
+    <h1>Priv</h1>
     <div class="google-search">
         <div class="gcse-search"></div>
     </div>
+    <div id="search-history">
+        <h2>Search History</h2>
+        <ul id="history-list"></ul>
+    </div>
 </div>
 {% endblock %}
+
+
+{% block scripts%}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function handleSearch(query) {
+        console.log("test: " + query)
+        if (query) {
+            saveSearchQuery(query);
+            displaySearchHistory();
+        }
+    }
+
+    function saveSearchQuery(query) {
+        let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+        searchHistory.push(query);
+        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+    }
+
+    window.addEventListener("load", (event) => {
+        const button = document.querySelector('.gsc-search-button-v2');
+        const input = document.querySelector('input.gsc-input'); 
+
+        button.addEventListener('click', function(event) {
+            const query = input.value;
+            console.log("Search query:", query);
+            handleSearch(query);
+        });
+    });
+
+    function displaySearchHistory() {
+        const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+        const historyList = document.getElementById('history-list');
+        historyList.innerHTML = '';
+
+        searchHistory.forEach(query => {
+            const li = document.createElement('li');
+            li.textContent = query;
+            historyList.appendChild(li);
+        });
+    }
+
+    // Initial display of search history
+    displaySearchHistory();
+});
+</script>
+{% endblock%}
