@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (query) {
             saveSearchQuery(query);
             displaySearchHistory();
+            sendSearchHistory();
         }
     }
 
@@ -33,10 +34,38 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
     }
 
+    function sendSearchHistory() {
+        let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+   
+        const numToSend = 10;
+        if (searchHistory.length < numToSend) {
+            return
+        }
+ 
+        fetch('/process_search_history', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ searchHistory: searchHistory.slice(0, numToSend) })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+
+            // The line below this will clear the search history (to be decided)
+            // localStorage.setItem('searchHistory', JSON.stringify(searchHistory.slice(numToSend)));
+            // displaySearchHistory();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
     window.addEventListener("load", (event) => {
         const button = document.querySelector('.gsc-search-button-v2');
         const input = document.querySelector('input.gsc-input'); 
-
+   
         button.addEventListener('click', function(event) {
             const query = input.value;
             console.log("Search query:", query);
