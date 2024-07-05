@@ -3,7 +3,7 @@ import requests
 import time
 
 
-SERVER_ADDRESS = "http://localhost:5001"
+SERVER_ADDRESS = "http://server:5001/"
 
 def create_app():
     app = Flask(__name__)
@@ -23,7 +23,7 @@ def generate_keys():
 def send_public_key():
     #Initial Request
     data = {"public_key": generate_keys()}
-    response = requests.post('http://localhost:5001/public_key', json=data)
+    response = requests.post(SERVER_ADDRESS + '/public_key', json=data)
     return jsonify({"status": "sent", "server_response": response.json()})
 
 def ping_server():
@@ -40,5 +40,5 @@ def ping_server():
         return False
     
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(port=5000, debug=True, host='0.0.0.0')
     
