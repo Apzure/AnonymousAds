@@ -12,3 +12,8 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
+
+  dev:
+    build:
+      context: ./dev
+      dockerfile: Dockerfile
