@@ -66,10 +66,19 @@ def get_training_data(X):
 
 def clear_fhe_dir():
     if os.path.exists(FHE_FILE_PATH):
-        shutil.rmtree(FHE_FILE_PATH)
-        print(f"Removed the directory: {FHE_FILE_PATH}")
-    os.makedirs(FHE_FILE_PATH)
-    print(f"Created the directory: {FHE_FILE_PATH}")
+        for filename in os.listdir(FHE_FILE_PATH):
+            file_path = os.path.join(FHE_FILE_PATH, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.remove(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(f'Failed to delete {file_path}. Reason: {e}')
+        print(f"Cleared the directory: {FHE_FILE_PATH}")
+    else:
+        os.makedirs(FHE_FILE_PATH)
+        print(f"Created the directory: {FHE_FILE_PATH}")
 
 
 n_inputs = 50

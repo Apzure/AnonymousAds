@@ -8,18 +8,22 @@ services:
       - "5000:5000"
     depends_on:
       - server
+    volumes: 
+      - dev-data:/app/fhe_directory:ro
   
   server:
     build:
       context: ./server
       dockerfile: Dockerfile
+    volumes: 
+      - dev-data:/app/fhe_directory:ro
 
   dev:
     build:
       context: ./dev
       dockerfile: Dockerfile
     volumes: 
-      - dev-data:$PWD/fhe_directory
+      - dev-data:/app/fhe_directory
 
 volumes:
   dev-data:
