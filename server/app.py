@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import requests
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO)
 
@@ -31,6 +32,29 @@ def recieve_search_history():
     else:
         logging.error("Invalid data received")
         return jsonify({"status": "error", "message": "Invalid data"}), 400
+
+@app.route('/get_keywords', methods=['GET'])
+def get_keywords():
+    logging.info("Received a request to /get_keywords")
+    
+    KEYWORDS_FILE = "./keywords.txt"
+    try:
+        # Check if the file exists
+        if not os.path.exists(KEYWORDS_FILE):
+            logging.error(f"Keywords file '{KEYWORDS_FILE}' not found")
+            return jsonify({"error": "Keywords file not found"}), 404
+
+        # Read keywords from the file
+        with open(KEYWORDS_FILE, 'r') as file:
+            keywords = [line.strip() for line in file if line.strip()]
+
+        logging.info(f"Successfully read {len(keywords)} keywords from the file")
+        return jsonify({"keywords": keywords})
+
+    except Exception as e:
+        logging.error(f"Error reading keywords file: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+    
 
 if __name__ == '__main__':
     app.run(port=5001, debug=True, host='0.0.0.0')

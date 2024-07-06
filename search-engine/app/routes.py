@@ -1,6 +1,6 @@
 from flask import render_template, request, jsonify
 from app import app
-from .key import send_key_to_server_if_not_sent, send_search_history_to_server
+from .key import send_key_to_server_if_not_sent, send_search_history_to_server, get_keywords_if_not_got
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -17,6 +17,8 @@ def process_search_history():
         return jsonify({"error": "No search history provided"}), 400
     logging.info("Received search history: %s", search_history)
     
+    get_keywords_if_not_got()
     send_key_to_server_if_not_sent()
+    
     send_search_history_to_server(search_history)
     return jsonify({"message": "Search history processed successfully"}), 200
