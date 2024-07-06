@@ -1,8 +1,8 @@
 version: '3.8.1'
 services:
-  client:
+  web:
     build:
-      context: ./client
+      context: ./search-engine
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
