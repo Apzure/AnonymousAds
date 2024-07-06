@@ -28,6 +28,11 @@
   padding: 20px;
 }
 
+.search-container a {
+  text-decoration: none;
+  color: #4285f4;
+}
+
 /* Header styling */
 h1 {
   margin-bottom: 30px;
