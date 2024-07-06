@@ -10,6 +10,7 @@ from nltk.stem.porter import PorterStemmer
 import os
 import requests
 import json
+import base64
 import logging 
 
 # Configure logging
@@ -19,10 +20,12 @@ logger = logging.getLogger(__name__)
 KEYWORDS_FILENAME = "./tmp/keywords.txt"
 STEMMED_KEYWORDS_FILENAME = "./tmp/stemmed_keywords.json"
 SERVER_ADDRESS = "http://server:5001/"
-FHE_FILE_PATH = "."
+FHE_FILE_PATH = "./fhe"
+
 REGEX = re.compile('[^a-zA-Z ]')
 STEMMER = PorterStemmer()
-# client = FHEModelClient(path_dir=FHE_FILE_PATH, key_dir="/tmp")
+client = FHEModelClient(path_dir=FHE_FILE_PATH)
+serialized_evaluation_keys = client.get_serialized_evaluation_keys()
 
 def init_keywords():
     get_keywords_if_not_got()
@@ -60,25 +63,42 @@ def process_keywords():
     with open(STEMMED_KEYWORDS_FILENAME, 'w') as file:
         json.dump(stemmed_keywords, file)
     logger.info(f"Stemmed Keywords file '{STEMMED_KEYWORDS_FILENAME}' has been created and written to.")    
-    
-def process_text(text):   
-    with open(STEMMED_KEYWORDS_FILENAME, 'r') as file:
-        stemmed_keywords = json.load(file)
-         
-    text = text.replace("-", " ")
-    text = REGEX.sub('', text)
-    text = text.lower()
-    text = text.split()
-    text = list(map(STEMMER.stem, text))
-     
-    freq = Counter(text)
-    vector = [freq[category] for category in stemmed_keywords]
-    return vector
 
+# Converts search history to encrypted normalized vector
+def process_search_history(search_history): 
+    try:
+        text = "".join(search_history)
+        with open(STEMMED_KEYWORDS_FILENAME, 'r') as file:
+            stemmed_keywords = json.load(file)
+            
+        text = text.replace("-", " ")
+        text = REGEX.sub('', text)
+        text = text.lower()
+        text = text.split()
+        text = list(map(STEMMER.stem, text))
+        freq = Counter(text)
+        vector = [freq[category] for category in stemmed_keywords]
+        normalized_vector = normalize(np.array(vector).reshape((1, -1)), norm="l1", axis=1)
+        encrypted_vector = client.quantize_encrypt_serialize(normalized_vector)
+        return encrypted_vector
+    except Exception as e:
+        logger.error(e)
+        raise
 
+def send_search_history_to_server(search_history):
+    try:
+        endpoint = SERVER_ADDRESS + "/recieve_search_history"
+        headers = {'Content-Type': 'application/json'}
+        
+        search_history_str = base64.b64encode(search_history).decode('utf-8')
+        payload = {"search_history": search_history_str}
 
-# serialized_evaluation_keys = client.get_serialized_evaluation_keys()
-# X_enc = client.quantize_encrypt_serialize(X_test)
-
-# X_new = np.random.rand(1, 20)
-# encrypted_data = client.quantize_encrypt_serialize(X_new)
+        response = requests.post(endpoint, json=payload, headers=headers)
+        if response.status_code == 200:
+            logger.info(f"Server is active: {SERVER_ADDRESS}")
+        else:
+            logger.warning(f"Server returned status code: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to connect to server: {e}")
+    except Exception as e:
+        logger.error(e)

@@ -73,7 +73,7 @@ h1 {
   padding: 1rem;
   z-index: 2;
 }
-
+/* TODO: "Search history" word title become bigger with an empty search history, it should be same size */
 .dropdown:hover .content {
   display: block;
 }

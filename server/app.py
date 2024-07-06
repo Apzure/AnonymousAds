@@ -2,10 +2,11 @@ from flask import Flask, request, jsonify
 import requests
 import logging
 import os
-from concrete.ml.deployment import  FHEModelServer
+import base64
+from concrete.ml.deployment import FHEModelServer
 from key import write_key, get_key
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 FHE_FILE_PATH_SERVER = "./fhe"
 
@@ -37,26 +38,31 @@ def recieve_key():
 def recieve_search_history():
     logging.info("Received a request to /recieve_search_history")
     data = request.json
-    
+    logging.info("0")
     try: 
         serialized_evaluation_keys = get_key()
     except Exception as e:
         logging.error(f"Error reading getting keys file: {str(e)}")
-        return jsonify({"error": "Internal server error"}), 500
-    
+        return jsonify({"error": "Internal server error, no key found"}), 500
+    logging.info("1")
         
     if data and 'search_history' in data:
+        logging.info("11")
         encrypted_input = data['search_history']
+        encrypted_input = base64.b64decode(encrypted_input)
         logging.info("Server has received search history: %s", encrypted_input)
         
         try: 
+            logging.info("111")
             encrypted_result = server.run(encrypted_input, serialized_evaluation_keys)
+            logging.info("1111")
         except Exception as e:
             logging.error(f"Error processing encrypted input {str(e)}")
             return jsonify({"error": "Internal server error"}), 500
 
         return jsonify({"status": "success", "result": encrypted_result}), 200
     else:
+        logging.info("2")
         logging.error("Invalid data received")
         return jsonify({"status": "error", "message": "Invalid data"}), 400
 

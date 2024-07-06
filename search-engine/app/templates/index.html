@@ -42,7 +42,7 @@ content %}
         return;
       }
 
-      fetch("/process_search_history", {
+      fetch("/send_search_history", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +55,7 @@ content %}
         .then((data) => {
           console.log("Success:", data);
 
-          // This line will clear the search history (to be decided)
+          // This line will clear the search history (to be decided) TODO make it take effect immediately
           localStorage.setItem(
             "searchHistory",
             JSON.stringify(searchHistory.slice(numToSend))

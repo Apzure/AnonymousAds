@@ -81,15 +81,3 @@ def send_key_to_server_if_not_sent():
         logger.error("Failed to send key to server!")
         raise Exception("Failed to send key to server!")
         
-def send_search_history_to_server(search_history):
-    endpoint = SERVER_ADDRESS + "/recieve_search_history"
-    headers = {'Content-Type': 'application/json'}
-    payload = json.dumps({'search_history': search_history})
-    try:
-        response = requests.post(endpoint, data=payload, headers=headers)
-        if response.status_code == 200:
-            logger.info(f"Server is active: {SERVER_ADDRESS}")
-        else:
-            logger.warning(f"Server returned status code: {response.status_code}")
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Failed to connect to server: {e}")
