@@ -1,19 +1,30 @@
 /* Basic reset */
-* {
+*,
+*::after,
+*::before {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Hide scrollbar */
+/* body {
+  overflow: hidden;
+} */
+
 /* Container styling */
 .container {
+  font-family: Arial, sans-serif;
+}
+
+/* Search container styling */
+.search-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   background-color: #ffffff;
-  font-family: Arial, sans-serif;
   padding: 20px;
 }
 
@@ -22,6 +33,56 @@ h1 {
   margin-bottom: 30px;
   font-size: 3rem;
   color: #4285f4;
+}
+
+/* History menu styling */
+.dropdown {
+  float: left;
+}
+
+.dropdown button {
+  background-color: white;
+  color: black;
+  padding: 1rem 1rem;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown ul {
+  list-style: none;
+  display: block;
+  color: black;
+  text-decoration: none;
+  padding: 10px 15px;
+}
+
+.dropdown .content {
+  display: none;
+  position: absolute;
+  left: 1.5%;
+  top: 55px;
+  background-color: #e9eefb;
+  min-width: 100px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 5%;
+  padding: 1rem;
+  z-index: 2;
+}
+
+.dropdown:hover .content {
+  display: block;
+}
+
+.dropdown:hover button {
+  color: grey;
+}
+
+#history-list {
+  padding: 0;
+}
+
+#history-list > li {
+  padding: 10px 0;
 }
 
 /* Search container styling */
