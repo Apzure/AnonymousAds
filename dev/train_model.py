@@ -12,16 +12,17 @@ import shutil
 from nltk.stem.porter import PorterStemmer
 
 REGEX = re.compile('[^a-zA-Z ]')
+NUM_CATEGORIES = 5
 KEYWORDS_PER_CATEGORY = 11
-CATEGORIES = ['sports', 'fitness', 'athletics', 'training', 'running', 'gear', 'gym', 'exercise', 'sportswear', 'outdoors', 'wellness',
+KEYWORDS = ['sports', 'fitness', 'athletics', 'training', 'running', 'gear', 'gym', 'exercise', 'sportswear', 'outdoors', 'wellness',
               'food', 'cuisine', 'gourmet', 'organic', 'recipes', 'delivery', 'dining', 'snacks', 'cooking', 'restaurants', 'healthy',
               'music', 'concerts', 'streaming', 'instruments', 'bands', 'festivals', 'songs', 'albums', 'lessons', 'dj', 'sound',
               'gaming', 'consoles', 'accessories', 'esports', 'multiplayer', 'virtual', 'pc', 'development', 'merchandise', 'livestream', 'communities',
               'tv', 'dramas', 'shows', 'smart', 'reviews', 'theater', 'cable', 'series', 'reality', 'channels', 'binge']
 
-# why is smart in TV here? also rename Categories to keywords
+# why is smart in TV here?
 STEMMER = PorterStemmer()
-STEMMED_CATEGORIES = list(map(STEMMER.stem, CATEGORIES))
+STEMMED_KEYWORDS = list(map(STEMMER.stem, KEYWORDS))
 FILE_PATH = './training_data.txt'
 FHE_FILE_PATH = "./fhe_directory"
 FHE_FILE_PATH_CLIENT = "./client"
@@ -45,15 +46,16 @@ def process_text(text):
     
     
     freq = Counter(text)
-    vector = [freq[category] for category in STEMMED_CATEGORIES]
-    return vector
+    return [freq[category] for category in STEMMED_KEYWORDS]
+
 
 def non_linear_fn(x):
+    # TO DO!
     # current model for testing
     global KEYWORDS_PER_CATEGORY
     reshaped = x[:len(x) - len(x) % KEYWORDS_PER_CATEGORY].reshape(-1, KEYWORDS_PER_CATEGORY)
-    sums = np.sum(reshaped, axis=1)
-    return sums
+    return np.sum(reshaped, axis=1)
+
 
 def get_training_data(X):
     # We can vary l1 or l2 in our case prob is l1
@@ -66,14 +68,23 @@ def get_training_data(X):
 
 def clear_fhe_dir():
     if os.path.exists(FHE_FILE_PATH):
-        shutil.rmtree(FHE_FILE_PATH)
-        print(f"Removed the directory: {FHE_FILE_PATH}")
-    os.makedirs(FHE_FILE_PATH)
-    print(f"Created the directory: {FHE_FILE_PATH}")
+        for filename in os.listdir(FHE_FILE_PATH):
+            file_path = os.path.join(FHE_FILE_PATH, filename)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.remove(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(f'Failed to delete {file_path}. Reason: {e}')
+        print(f"Cleared the directory: {FHE_FILE_PATH}")
+    else:
+        os.makedirs(FHE_FILE_PATH)
+        print(f"Created the directory: {FHE_FILE_PATH}")
 
 
-n_inputs = 50
-n_outputs = 5
+n_inputs = len(KEYWORDS)
+n_outputs = NUM_CATEGORIES
 params = {
     "module__n_layers": 3,
     "module__activation_function" : nn.ReLU,
@@ -89,7 +100,7 @@ params = {
 }
 
 
-print(f"Keywords is multiple of # of categories {len(CATEGORIES) % KEYWORDS_PER_CATEGORY == 0}")
+print(f"Keywords is multiple of # of categories {NUM_CATEGORIES * KEYWORDS_PER_CATEGORY == len(KEYWORDS)}")
 corpus = read_file_to_array(FILE_PATH)
 corpus_mat = np.array(list(map(process_text, corpus)))
 
@@ -99,7 +110,7 @@ print("KEYWORD_HITS", Counter(keyword_hits))
 # favours 1-2 keyword hits, but has at least 10 examples of everything else as well (incl no hits at all)
 
 keyword_spread = np.sum(corpus_mat, axis=0)
-reshaped_keyword_spread = keyword_spread.reshape(-1, 11)
+reshaped_keyword_spread = keyword_spread.reshape(-1, KEYWORDS_PER_CATEGORY)
 delimiter = ' | '
 print("KEYWORD_SPREAD")
 for row in reshaped_keyword_spread:
@@ -128,19 +139,17 @@ dev.save()
 # Setup the client
 client = FHEModelClient(path_dir=FHE_FILE_PATH_CLIENT, key_dir="/tmp/keys_client")
 serialized_evaluation_keys = client.get_serialized_evaluation_keys()
-X_enc = client.quantize_encrypt_serialize(X_test)
+X_enc = client.quantize_encrypt_serialize(X_test[0])
 
-X_new = np.random.rand(1, 20)
-encrypted_data = client.quantize_encrypt_serialize(X_new)
 
 # Setup the server
 server = FHEModelServer(path_dir=FHE_FILE_PATH_SERVER)
 server.load()
 
 # Server processes the encrypted data
-encrypted_result = server.run(encrypted_data, serialized_evaluation_keys)
+encrypted_result = server.run(X_enc, serialized_evaluation_keys)
 
 # Client decrypts the result
 y_enc = client.deserialize_decrypt_dequantize(encrypted_result)
 
-print("ENCRYPTED LOSS", np.sum((y_enc - y_test) ** 2) / y_test.shape[0])
+print("ENCRYPTED LOSS", np.sum((y_enc - y_test[0]) ** 2) / y_test.shape[0])
