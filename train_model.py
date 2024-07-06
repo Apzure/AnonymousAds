@@ -1,45 +1,84 @@
 # This trains and compiles the model into a folder
-from concrete.ml.sklearn import DecisionTreeClassifier
+from concrete.ml.sklearn import NeuralNetRegressor
 from concrete.ml.deployment import FHEModelDev, FHEModelClient, FHEModelServer
 import numpy as np
+import torch.nn as nn
+from collections import Counter
+import re
+from sklearn.preprocessing import normalize
+from sklearn.model_selection import train_test_split
 
-# Define the directory for FHE client/server files
-fhe_directory = '/tmp/fhe_client_server_files/'
+REGEX = re.compile('[^a-zA-Z ]')
+CATEGORIES = ['fitness', 'athletics', 'training', 'running', 'gear', 'gym', 'exercise', 'sportswear', 'outdoors', 'wellness',
+              'cuisine', 'gourmet', 'organic', 'recipes', 'delivery', 'dining', 'snacks', 'cooking', 'restaurants', 'healthy',
+              'concerts', 'streaming', 'instruments', 'bands', 'festivals', 'songs', 'albums', 'lessons', 'dj', 'sound',
+              'consoles', 'accessories', 'esports', 'multiplayer', 'virtual', 'pc', 'development', 'merchandise', 'streaming', 'communities',
+              'streaming', 'shows', 'smart', 'reviews', 'theater', 'cable', 'series', 'reality', 'channels', 'binge']
 
-# Initialize the Decision Tree model
-model = DecisionTreeClassifier()
+# why is smart in TV here?
 
-print("IMPORTED MODEL")
-# Generate some random data for training
-X = np.random.rand(100, 20)
-y = np.random.randint(0, 2, size=100)
+def read_file_to_array(file_path):
+    with open(file_path, 'r') as file:
+        lines = [line.strip() for line in file]
+    return lines
 
-# Train and compile the model
-model.fit(X, y)
-model.compile(X)
+def process_text(text):
+    global CATEGORIES
+    global REGEX
+    text_alpha = REGEX.sub('', text)
+    text_lower = text_alpha.lower()
+    text_split = text_lower.split()
+    
+    freq = Counter(text_split)
+    vector = [freq[category] for category in CATEGORIES]
+    return vector
 
-print("COMPILED MODEL")
-# Setup the development environment
-dev = FHEModelDev(path_dir=fhe_directory, model=model)
-dev.save()
+file_path = 'training_data.txt'
+corpus = read_file_to_array(file_path)
+corpus_mat = np.array(list(map(process_text, corpus)))
 
-print("SAVED MODEL")
-# Setup the client
-client = FHEModelClient(path_dir=fhe_directory, key_dir="/tmp/keys_client")
-serialized_evaluation_keys = client.get_serialized_evaluation_keys()
+keyword_hits = np.sum(corpus_mat, axis=1)
+print("KEYWORD_HITS", Counter(keyword_hits))
 
-print(serialized_evaluation_keys)
+# Jeremiah try generating training data and running this until you get a distribution that
+# favours 1-2 keyword hits, but has at least 10 examples of everything else as well (incl no hits at all)
 
-# Client pre-processes new data
-X_new = np.random.rand(1, 20)
-encrypted_data = client.quantize_encrypt_serialize(X_new)
+keyword_spread = np.sum(corpus_mat, axis=0)
+print("KEYWORD_SPREAD", keyword_spread)
 
-# Setup the server
-server = FHEModelServer(path_dir=fhe_directory)
-server.load()
+# Jeremiah try generating training data and running this until you get an even distribution across all
+# keywords
 
-# Server processes the encrypted data
-encrypted_result = server.run(encrypted_data, serialized_evaluation_keys)
+normalised_data = normalize(corpus_mat, axis=1, norm='l1') #We can vary l1 or l2 in our case prob is l1
 
-# Client decrypts the result
-result = client.deserialize_decrypt_dequantize(encrypted_result)
+def non_linear_fn(x):
+    # current model for testing
+    keywords_per_cat = 10
+    reshaped = x[:len(x) - len(x) % keywords_per_cat].reshape(-1, keywords_per_cat)
+    sums = np.sum(reshaped, axis=1)
+    return sums
+
+print(non_linear_fn(np.arange(1, 50)))
+
+def get_training_data(X):
+    y = np.apply_along_axis(non_linear_fn, axis=1)
+    return train_test_split(X, y, random_state=41, test_size=0.25) # REMOVE RANDOM STATE LATER AFTER MODEL HAS BEEN SETTLED ON
+
+n_inputs = 50
+n_outputs = 5
+params = {
+    "module__n_layers": 3,
+    "module__activation_function" : nn.ReLU,
+    "module__n_hidden_neurons_multiplier" : 4,
+    
+    "n_w_bits" : 3, 
+    "n_a_bits" : 3,
+    "n_accum_bits" : 64,
+    
+    "max_epochs": 3,
+    "verbose" : True,
+    "lr" : 1e-3,
+}
+
+concrete_classifier = NeuralNetRegressor(**params)
+
