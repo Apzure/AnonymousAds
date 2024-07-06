@@ -21,8 +21,7 @@ CATEGORIES = ['fitness', 'athletics', 'training', 'running', 'gear', 'gym', 'exe
 # why is smart in TV here? also rename Categories to keywords
 STEMMER = PorterStemmer()
 STEMMED_CATEGORIES = list(map(STEMMER.stem, CATEGORIES))
-
-print(f"Keywords is multiple of # of categories {CATEGORIES % KEYWORDS_PER_CATEGORY == 0}")
+FILE_PATH = './training_data.txt'
 
 def read_file_to_array(file_path):
     with open(file_path, 'r') as file:
@@ -45,34 +44,20 @@ def process_text(text):
     vector = [freq[category] for category in STEMMED_CATEGORIES]
     return vector
 
-file_path = 'training_data.txt'
-corpus = read_file_to_array(file_path)
-corpus_mat = np.array(list(map(process_text, corpus)))
-
-keyword_hits = np.sum(corpus_mat, axis=1)
-print("KEYWORD_HITS", Counter(keyword_hits))
-
-# Jeremiah try generating training data and running this until you get a distribution that
-# favours 1-2 keyword hits, but has at least 10 examples of everything else as well (incl no hits at all)
-
-keyword_spread = np.sum(corpus_mat, axis=0)
-print("KEYWORD_SPREAD", keyword_spread)
-
-# Jeremiah try generating training data and running this until you get an even distribution across all
-# keywords
-
-normalised_data = normalize(corpus_mat, axis=1, norm='l1') #We can vary l1 or l2 in our case prob is l1
-
 def non_linear_fn(x):
     # current model for testing
     global KEYWORDS_PER_CATEGORY
-    print(f"SHAPE OF X is CORRECT {x.shape[0] % KEYWORDS_PER_CATEGORY == 0}")
     reshaped = x[:len(x) - len(x) % KEYWORDS_PER_CATEGORY].reshape(-1, KEYWORDS_PER_CATEGORY)
     sums = np.sum(reshaped, axis=1)
     return sums
 
 def get_training_data(X):
-    y = np.apply_along_axis(non_linear_fn, axis=1)
+    # We can vary l1 or l2 in our case prob is l1
+    X = normalize(X, axis=1, norm='l1') 
+    
+    y = np.apply_along_axis(non_linear_fn, axis=1, arr=X)
+    y = normalize(y, axis=1, norm='l1')
+    
     return train_test_split(X, y, random_state=41, test_size=0.25) # REMOVE RANDOM STATE LATER AFTER MODEL HAS BEEN SETTLED ON
 
 n_inputs = 50
@@ -82,15 +67,34 @@ params = {
     "module__activation_function" : nn.ReLU,
     "module__n_hidden_neurons_multiplier" : 4,
     
-    "n_w_bits" : 3, 
-    "n_a_bits" : 3,
-    "n_accum_bits" : 64,
+    "module__n_w_bits" : 3, 
+    "module__n_a_bits" : 3,
+    "module__n_accum_bits" : 64,
     
-    "max_epochs": 3,
+    "max_epochs": 10,
     "verbose" : True,
     "lr" : 1e-3,
 }
 
-concrete_classifier = NeuralNetRegressor(**params)
-get_training_data(X)
 
+print(f"Keywords is multiple of # of categories {len(CATEGORIES) % KEYWORDS_PER_CATEGORY == 0}")
+corpus = read_file_to_array(FILE_PATH)
+corpus_mat = np.array(list(map(process_text, corpus)))
+
+keyword_hits = np.sum(corpus_mat, axis=1)
+print("KEYWORD_HITS", Counter(keyword_hits))
+# Jeremiah try generating training data and running this until you get a distribution that
+# favours 1-2 keyword hits, but has at least 10 examples of everything else as well (incl no hits at all)
+
+keyword_spread = np.sum(corpus_mat, axis=0)
+print("KEYWORD_SPREAD", keyword_spread)
+# Jeremiah try generating training data and running this until you get an even distribution across all
+# keywords
+
+X_train, X_test, y_train, y_test = get_training_data(corpus_mat)
+
+concrete_classifier = NeuralNetRegressor(**params)
+concrete_classifier.fit(X_train, y_train)
+y_pred = concrete_classifier.predict(X_test)
+
+print(np.sum((y_pred - y_test) ** 2) / y_pred.shape[0])
