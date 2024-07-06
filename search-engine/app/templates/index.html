@@ -1,91 +1,94 @@
-{% extends 'base.html' %}
-
-{% block title %}Search Engine{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% block title %}Search Engine{% endblock %} {% block
+content %}
 <div class="container">
-    <h1>Priv</h1>
-    <div class="google-search">
-        <div class="gcse-search"></div>
-    </div>
-    <div id="search-history">
-        <h2>Search History</h2>
-        <ul id="history-list"></ul>
-    </div>
+  <h1>Priv</h1>
+  <div class="google-search">
+    <div class="gcse-search"></div>
+  </div>
+  <div id="search-history">
+    <h2>Search History</h2>
+    <ul id="history-list"></ul>
+  </div>
 </div>
-{% endblock %}
-
-
-{% block scripts%}
+{% endblock %} {% block scripts%}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener("DOMContentLoaded", function () {
     function handleSearch(query) {
-        if (query) {
-            saveSearchQuery(query);
-            displaySearchHistory();
-            sendSearchHistory();
-        }
+      if (query) {
+        saveSearchQuery(query);
+        displaySearchHistory();
+        sendSearchHistory();
+      }
     }
 
     function saveSearchQuery(query) {
-        let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-        searchHistory.push(query);
-        localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+      let searchHistory =
+        JSON.parse(localStorage.getItem("searchHistory")) || [];
+      searchHistory.push(query);
+      localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
     }
 
     function sendSearchHistory() {
-        let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-   
-        const numToSend = 5;
-        if (searchHistory.length < numToSend) {
-            return
-        }
- 
-        fetch('/process_search_history', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ searchHistory: searchHistory.slice(0, numToSend) })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
+      let searchHistory =
+        JSON.parse(localStorage.getItem("searchHistory")) || [];
 
-            // This line will clear the search history (to be decided)
-            localStorage.setItem('searchHistory', JSON.stringify(searchHistory.slice(numToSend)));
-            displaySearchHistory();
+      const numToSend = 5;
+      if (searchHistory.length < numToSend) {
+        return;
+      }
+
+      fetch("/process_search_history", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          searchHistory: searchHistory.slice(0, numToSend),
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Success:", data);
+
+          // This line will clear the search history (to be decided)
+          localStorage.setItem(
+            "searchHistory",
+            JSON.stringify(searchHistory.slice(numToSend))
+          );
+          displaySearchHistory();
         })
-        .catch(error => {
-            console.error('Error:', error);
+        .catch((error) => {
+          console.error("Error:", error);
         });
     }
 
-    window.addEventListener("load", (event) => { //TODO Need to work on enter key
-        const button = document.querySelector('.gsc-search-button-v2');
-        const input = document.querySelector('input.gsc-input'); 
-   
-        button.addEventListener('click', function(event) {  
-            const query = input.value;
-            console.log("Search query:", query);
-            handleSearch(query);
-        });
+    window.addEventListener("load", (event) => {
+      //TODO Need to work on enter key
+      const button = document.querySelector(".gsc-search-button-v2");
+      const input = document.querySelector("input.gsc-input");
+
+      button.addEventListener("click", function (event) {
+        const query = input.value;
+        console.log("Search query:", query);
+        handleSearch(query);
+      });
     });
 
     function displaySearchHistory() {
-        const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
-        const historyList = document.getElementById('history-list');
-        historyList.innerHTML = '';
+      const searchHistory =
+        JSON.parse(localStorage.getItem("searchHistory")) || [];
+      const historyList = document.getElementById("history-list");
+      historyList.innerHTML = "";
 
-        searchHistory.forEach(query => {
-            const li = document.createElement('li');
-            li.textContent = query;
-            historyList.appendChild(li);
-        });
+      searchHistory.forEach((query) => {
+        const li = document.createElement("li");
+        li.textContent = query;
+        historyList.appendChild(li);
+      });
     }
 
     // Initial display of search history
     displaySearchHistory();
-});
+  });
 </script>
 {% endblock%}

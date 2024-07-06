@@ -1,89 +1,89 @@
 /* Basic reset */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 /* Container styling */
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #ffffff;
-    font-family: Arial, sans-serif;
-    padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+  padding: 20px;
 }
 
 /* Header styling */
 h1 {
-    margin-bottom: 30px;
-    font-size: 3rem;
-    color: #4285f4;
+  margin-bottom: 30px;
+  font-size: 3rem;
+  color: #4285f4;
 }
 
 /* Search container styling */
 .google-search {
-    width: 100%;
-    max-width: 2000px;  
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
+  width: 100%;
+  max-width: 2000px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .gcse-search input.gsc-input:focus {
-    box-shadow: 0 0 10px rgba(66, 133, 244, 0.3);
+  box-shadow: 0 0 10px rgba(66, 133, 244, 0.3);
 }
 
 /* Custom search button styling */
 .gcse-search button.gsc-search-button {
-    display: none;
+  display: none;
 }
 
 .google-search .gsc-search-box {
-    width: 100%;
-    min-width: 700px;
-    max-width: 1000px;  
+  width: 100%;
+  min-width: 700px;
+  max-width: 1000px;
 }
 
 /* Search results styling */
 .gsc-results-wrapper-visible {
-    width: 100%;
-    max-width: 1500px; 
-    margin-top: 20px;
-    background-color: #fff;
-    border: 1px solid #dfe1e5;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px; 
+  width: 100%;
+  max-width: 1500px;
+  margin-top: 20px;
+  background-color: #fff;
+  border: 1px solid #dfe1e5;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
 }
 
 /* Result item styling */
 .gsc-result {
-    padding: 20px;  /* Increased padding */
-    border-bottom: 1px solid #dfe1e5;
+  padding: 20px; /* Increased padding */
+  border-bottom: 1px solid #dfe1e5;
 }
 
 .gsc-result:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 /* Result title styling */
 .gsc-title {
-    color: #1a0dab;
-    font-size: 1.5rem;  /* Increased font size */
+  color: #1a0dab;
+  font-size: 1.5rem; /* Increased font size */
 }
 
 /* Result snippet styling */
 .gsc-snippet {
-    color: #4d5156;
-    font-size: 1.2rem;  /* Increased font size */
+  color: #4d5156;
+  font-size: 1.2rem; /* Increased font size */
 }
 
 /* URL styling */
 .gsc-url {
-    color: #006621;
-    font-size: 1rem;  /* Increased font size */
+  color: #006621;
+  font-size: 1rem; /* Increased font size */
 }
