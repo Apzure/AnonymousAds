@@ -12,12 +12,12 @@ import shutil
 from nltk.stem.porter import PorterStemmer
 
 REGEX = re.compile('[^a-zA-Z ]')
-KEYWORDS_PER_CATEGORY = 10
-CATEGORIES = ['fitness', 'athletics', 'training', 'running', 'gear', 'gym', 'exercise', 'sportswear', 'outdoors', 'wellness',
-              'cuisine', 'gourmet', 'organic', 'recipes', 'delivery', 'dining', 'snacks', 'cooking', 'restaurants', 'healthy',
-              'concerts', 'streaming', 'instruments', 'bands', 'festivals', 'songs', 'albums', 'lessons', 'dj', 'sound',
-              'consoles', 'accessories', 'esports', 'multiplayer', 'virtual', 'pc', 'development', 'merchandise', 'streaming', 'communities',
-              'streaming', 'shows', 'smart', 'reviews', 'theater', 'cable', 'series', 'reality', 'channels', 'binge']
+KEYWORDS_PER_CATEGORY = 11
+CATEGORIES = ['sports', 'fitness', 'athletics', 'training', 'running', 'gear', 'gym', 'exercise', 'sportswear', 'outdoors', 'wellness',
+              'food', 'cuisine', 'gourmet', 'organic', 'recipes', 'delivery', 'dining', 'snacks', 'cooking', 'restaurants', 'healthy',
+              'music', 'concerts', 'streaming', 'instruments', 'bands', 'festivals', 'songs', 'albums', 'lessons', 'dj', 'sound',
+              'gaming', 'consoles', 'accessories', 'esports', 'multiplayer', 'virtual', 'pc', 'development', 'merchandise', 'livestream', 'communities',
+              'tv', 'dramas', 'shows', 'smart', 'reviews', 'theater', 'cable', 'series', 'reality', 'channels', 'binge']
 
 # why is smart in TV here? also rename Categories to keywords
 STEMMER = PorterStemmer()
@@ -99,9 +99,16 @@ print("KEYWORD_HITS", Counter(keyword_hits))
 # favours 1-2 keyword hits, but has at least 10 examples of everything else as well (incl no hits at all)
 
 keyword_spread = np.sum(corpus_mat, axis=0)
-print("KEYWORD_SPREAD", keyword_spread)
+reshaped_keyword_spread = keyword_spread.reshape(-1, 11)
+delimiter = ' | '
+print("KEYWORD_SPREAD")
+for row in reshaped_keyword_spread:
+    print(delimiter.join(map(str, row)))
 # Jeremiah try generating training data and running this until you get an even distribution across all
 # keywords
+
+category_sum = reshaped_keyword_spread.sum(axis=1)
+print("CATEGORY_SUM", category_sum)
 
 X_train, X_test, y_train, y_test = get_training_data(corpus_mat)
 
