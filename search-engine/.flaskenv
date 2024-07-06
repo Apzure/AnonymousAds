@@ -1,2 +1,0 @@
-FLASK_APP=search_engine.py
-FLASK_ENV=development
