@@ -19,8 +19,10 @@ logger = logging.getLogger(__name__)
 KEYWORDS_FILENAME = "./tmp/keywords.txt"
 STEMMED_KEYWORDS_FILENAME = "./tmp/stemmed_keywords.json"
 SERVER_ADDRESS = "http://server:5001/"
+FHE_FILE_PATH = "."
 REGEX = re.compile('[^a-zA-Z ]')
 STEMMER = PorterStemmer()
+# client = FHEModelClient(path_dir=FHE_FILE_PATH, key_dir="/tmp")
 
 def init_keywords():
     get_keywords_if_not_got()
@@ -72,3 +74,11 @@ def process_text(text):
     freq = Counter(text)
     vector = [freq[category] for category in stemmed_keywords]
     return vector
+
+
+
+# serialized_evaluation_keys = client.get_serialized_evaluation_keys()
+# X_enc = client.quantize_encrypt_serialize(X_test)
+
+# X_new = np.random.rand(1, 20)
+# encrypted_data = client.quantize_encrypt_serialize(X_new)
