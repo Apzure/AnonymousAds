@@ -7,6 +7,8 @@ from collections import Counter
 import re
 from sklearn.preprocessing import normalize
 from sklearn.model_selection import train_test_split
+import os
+import shutil
 from nltk.stem.porter import PorterStemmer
 
 REGEX = re.compile('[^a-zA-Z ]')
@@ -22,7 +24,8 @@ STEMMER = PorterStemmer()
 STEMMED_CATEGORIES = list(map(STEMMER.stem, CATEGORIES))
 FILE_PATH = './training_data.txt'
 FHE_FILE_PATH = "./fhe_directory"
-
+FHE_FILE_PATH_CLIENT = "./client"
+FHE_FILE_PATH_SERVER = "./server"
 
 def read_file_to_array(file_path):
     with open(file_path, 'r') as file:
@@ -60,6 +63,14 @@ def get_training_data(X):
     y = normalize(y, axis=1, norm='l1')
     
     return train_test_split(X, y, random_state=41, test_size=0.25) # REMOVE RANDOM STATE LATER AFTER MODEL HAS BEEN SETTLED ON
+
+def clear_fhe_dir():
+    if os.path.exists(FHE_FILE_PATH):
+        shutil.rmtree(FHE_FILE_PATH)
+        print(f"Removed the directory: {FHE_FILE_PATH}")
+    os.makedirs(FHE_FILE_PATH)
+    print(f"Created the directory: {FHE_FILE_PATH}")
+
 
 n_inputs = 50
 n_outputs = 5
@@ -102,5 +113,27 @@ print(np.sum((y_pred - y_test) ** 2) / y_pred.shape[0])
 
 concrete_regressor.compile(X_train)
 dev = FHEModelDev(path_dir=FHE_FILE_PATH, model=concrete_regressor)
-f = open("myfile.txt", "w")
+
+clear_fhe_dir()
 dev.save()
+
+
+# Setup the client
+client = FHEModelClient(path_dir=FHE_FILE_PATH_CLIENT, key_dir="/tmp/keys_client")
+serialized_evaluation_keys = client.get_serialized_evaluation_keys()
+X_enc = client.quantize_encrypt_serialize(X_test)
+
+X_new = np.random.rand(1, 20)
+encrypted_data = client.quantize_encrypt_serialize(X_new)
+
+# Setup the server
+server = FHEModelServer(path_dir=FHE_FILE_PATH_SERVER)
+server.load()
+
+# Server processes the encrypted data
+encrypted_result = server.run(encrypted_data, serialized_evaluation_keys)
+
+# Client decrypts the result
+y_enc = client.deserialize_decrypt_dequantize(encrypted_result)
+
+print("ENCRYPTED LOSS", np.sum((y_enc - y_test) ** 2) / y_test.shape[0])
