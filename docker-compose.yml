@@ -8,19 +8,15 @@ services:
       - "5000:5000"
     depends_on:
       - server
-<<<<<<< HEAD
-
-=======
     ### For dev
-    volumes: 
+    volumes:
       - ./search-engine:/app
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
     command: flask run --host=0.0.0.0 --port=5000 --reload
     ###
-    
->>>>>>> 2f6f3b449cb39944098a108db0addfdcad37d6a7
+
   server:
     build:
       context: ./server
@@ -29,8 +25,4 @@ services:
   dev:
     build:
       context: ./dev
-<<<<<<< HEAD
       dockerfile: Dockerfile
-=======
-      dockerfile: Dockerfile
->>>>>>> 2f6f3b449cb39944098a108db0addfdcad37d6a7
