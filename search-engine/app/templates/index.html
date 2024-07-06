@@ -61,13 +61,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    window.addEventListener("load", (event) => { //TODO Need to work on enter key
-        const button = document.querySelector('.gsc-search-button-v2');
+    window.addEventListener("load", (event) => {
+        // Listening for form submit doesn't work, hence these two listeners
         const input = document.querySelector('input.gsc-input'); 
-   
+        const button = document.querySelector('.gsc-search-button-v2');
+
+        input.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const query = input.value;
+                handleSearch(query);
+            }
+        });
+            
         button.addEventListener('click', function(event) {  
             const query = input.value;
-            console.log("Search query:", query);
             handleSearch(query);
         });
     });
