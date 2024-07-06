@@ -1,31 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <script async src="https://cse.google.com/cse.js?cx=c7f2770c067734f6e"> </script>
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <script
+      async
+      src="https://cse.google.com/cse.js?cx=c7f2770c067734f6e"
+    ></script>
+  </head>
+  <body>
     <header>
-        <!-- Navigation bar, logo, etc. -->
+      <!-- Navigation bar, logo, etc. -->
     </header>
 
     <main>
-        {% block content %}
-        <!-- Default content goes here -->
-        {% endblock %}
+      {% block content %}
+      <!-- Default content goes here -->
+      {% endblock %}
     </main>
 
     <footer>
-        <!-- Footer content -->
+      <!-- Footer content -->
     </footer>
 
- 
     {% block scripts %}
-        <!-- Default scripts go here -->
+    <!-- Default scripts go here -->
     {% endblock %}
-
-</body>
+  </body>
 </html>

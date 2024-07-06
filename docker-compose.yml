@@ -1,4 +1,4 @@
-version: '3.8.1'
+version: "3.8.1"
 services:
   web:
     build:
@@ -8,21 +8,27 @@ services:
       - "5000:5000"
     depends_on:
       - server
-    ### For dev
-    volumes: 
+    volumes:
+      - dev-data:/app/fhe_directory:ro
       - ./search-engine:/app
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
     command: flask run --host=0.0.0.0 --port=5000 --reload
-    ###
-    
+
   server:
     build:
       context: ./server
       dockerfile: Dockerfile
+    volumes:
+      - dev-data:/app/fhe_directory:ro
 
   dev:
     build:
       context: ./dev
       dockerfile: Dockerfile
+    volumes:
+      - dev-data:/app/fhe_directory
+
+volumes:
+  dev-data:
