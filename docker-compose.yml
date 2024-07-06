@@ -1,13 +1,14 @@
 version: '3.8.1'
 services:
-  client:
+  web:
     build:
-      context: ./client
+      context: ./search-engine
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
     depends_on:
       - server
+  
   server:
     build:
       context: ./server
@@ -17,3 +18,8 @@ services:
     build:
       context: ./dev
       dockerfile: Dockerfile
+    volumes: 
+      - dev-data:$PWD/fhe_directory
+
+volumes:
+  dev-data:

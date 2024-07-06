@@ -7,7 +7,6 @@ from collections import Counter
 import re
 from sklearn.preprocessing import normalize
 from sklearn.model_selection import train_test_split
-
 from nltk.stem.porter import PorterStemmer
 
 REGEX = re.compile('[^a-zA-Z ]')
@@ -22,6 +21,8 @@ CATEGORIES = ['sports', 'fitness', 'athletics', 'training', 'running', 'gear', '
 STEMMER = PorterStemmer()
 STEMMED_CATEGORIES = list(map(STEMMER.stem, CATEGORIES))
 FILE_PATH = './training_data.txt'
+FHE_FILE_PATH = "./fhe_directory"
+
 
 def read_file_to_array(file_path):
     with open(file_path, 'r') as file:
@@ -100,8 +101,13 @@ print("CATEGORY_SUM", category_sum)
 
 X_train, X_test, y_train, y_test = get_training_data(corpus_mat)
 
-concrete_classifier = NeuralNetRegressor(**params)
-concrete_classifier.fit(X_train, y_train)
-y_pred = concrete_classifier.predict(X_test)
+concrete_regressor = NeuralNetRegressor(**params)
+concrete_regressor.fit(X_train, y_train)
+y_pred = concrete_regressor.predict(X_test)
 
 print(np.sum((y_pred - y_test) ** 2) / y_pred.shape[0])
+
+concrete_regressor.compile(X_train)
+dev = FHEModelDev(path_dir=FHE_FILE_PATH, model=concrete_regressor)
+f = open("myfile.txt", "w")
+dev.save()
