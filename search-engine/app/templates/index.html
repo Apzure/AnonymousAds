@@ -20,7 +20,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     function handleSearch(query) {
-        console.log("test: " + query)
         if (query) {
             saveSearchQuery(query);
             displaySearchHistory();
@@ -37,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function sendSearchHistory() {
         let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
    
-        const numToSend = 10;
+        const numToSend = 5;
         if (searchHistory.length < numToSend) {
             return
         }
@@ -53,20 +52,20 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             console.log('Success:', data);
 
-            // The line below this will clear the search history (to be decided)
-            // localStorage.setItem('searchHistory', JSON.stringify(searchHistory.slice(numToSend)));
-            // displaySearchHistory();
+            // This line will clear the search history (to be decided)
+            localStorage.setItem('searchHistory', JSON.stringify(searchHistory.slice(numToSend)));
+            displaySearchHistory();
         })
         .catch(error => {
             console.error('Error:', error);
         });
     }
 
-    window.addEventListener("load", (event) => {
+    window.addEventListener("load", (event) => { //TODO this does not attach fast enough, might need to deactivate button first? Also need to work on enter key
         const button = document.querySelector('.gsc-search-button-v2');
         const input = document.querySelector('input.gsc-input'); 
    
-        button.addEventListener('click', function(event) {
+        button.addEventListener('click', function(event) { 
             const query = input.value;
             console.log("Search query:", query);
             handleSearch(query);
