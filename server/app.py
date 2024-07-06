@@ -2,10 +2,23 @@ from flask import Flask, request, jsonify
 import requests
 import logging
 import os
+from concrete.ml.deployment import  FHEModelServer
+from key import write_key, get_key
 
 logging.basicConfig(level=logging.INFO)
 
+FHE_FILE_PATH_SERVER = "./fhe"
+
+
+
 app = Flask(__name__)
+server = FHEModelServer(path_dir=FHE_FILE_PATH_SERVER)
+try:
+    server.load()
+except RuntimeError as e:
+    logging.error(e)
+    raise
+
 
 @app.route('/recieve_public_key', methods=['POST'])
 def recieve_key():
@@ -14,6 +27,7 @@ def recieve_key():
     if data and 'key' in data:
         key = data['key']
         logging.info(f"Received key: {key}")
+        write_key(key)
         return jsonify({"status": "success"}), 200
     else:
         logging.error("Invalid data received")
@@ -23,12 +37,25 @@ def recieve_key():
 def recieve_search_history():
     logging.info("Received a request to /recieve_search_history")
     data = request.json
-    #TODO check if key has been sent? If not return some other http response code to get client to send
+    
+    try: 
+        serialized_evaluation_keys = get_key()
+    except Exception as e:
+        logging.error(f"Error reading getting keys file: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+    
+        
     if data and 'search_history' in data:
-        history = data['search_history']
-        logging.info("Server has received search history: %s", history)
-        #TODO Call function to process search history
-        return jsonify({"status": "success"}), 200
+        encrypted_input = data['search_history']
+        logging.info("Server has received search history: %s", encrypted_input)
+        
+        try: 
+            encrypted_result = server.run(encrypted_input, serialized_evaluation_keys)
+        except Exception as e:
+            logging.error(f"Error processing encrypted input {str(e)}")
+            return jsonify({"error": "Internal server error"}), 500
+
+        return jsonify({"status": "success", }), 200
     else:
         logging.error("Invalid data received")
         return jsonify({"status": "error", "message": "Invalid data"}), 400
