@@ -8,7 +8,15 @@ services:
       - "5000:5000"
     depends_on:
       - server
-  
+    ### For dev
+    volumes: 
+      - ./search-engine:/app
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+    command: flask run --host=0.0.0.0 --port=5000 --reload
+    ###
+    
   server:
     build:
       context: ./server
@@ -18,8 +26,3 @@ services:
     build:
       context: ./dev
       dockerfile: Dockerfile
-    volumes: 
-      - dev-data:$PWD/fhe_directory
-
-volumes:
-  dev-data:
