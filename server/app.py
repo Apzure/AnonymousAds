@@ -55,7 +55,7 @@ def recieve_search_history():
             logging.error(f"Error processing encrypted input {str(e)}")
             return jsonify({"error": "Internal server error"}), 500
 
-        return jsonify({"status": "success", }), 200
+        return jsonify({"status": "success", "result": encrypted_result}), 200
     else:
         logging.error("Invalid data received")
         return jsonify({"status": "error", "message": "Invalid data"}), 400
