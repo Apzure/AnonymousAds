@@ -121,14 +121,14 @@ print(np.sum((y_pred - y_test) ** 2) / y_pred.shape[0])
 concrete_regressor.compile(X_train)
 dev = FHEModelDev(path_dir=FHE_FILE_PATH, model=concrete_regressor)
 
-clear_fhe_dir()
-dev.save()
+# clear_fhe_dir()
+# dev.save()
 
 
 # Setup the client
 client = FHEModelClient(path_dir=FHE_FILE_PATH_CLIENT, key_dir="/tmp/keys_client")
 serialized_evaluation_keys = client.get_serialized_evaluation_keys()
-X_enc = client.quantize_encrypt_serialize(X_test[0])
+X_enc = client.quantize_encrypt_serialize(X_test[0].reshape((1, -1)))
 
 
 # Setup the server
