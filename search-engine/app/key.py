@@ -80,30 +80,6 @@ def send_key_to_server_if_not_sent():
     else:
         logger.error("Failed to send key to server!")
         raise Exception("Failed to send key to server!")
-
-def is_keywords_got():
-    return os.path.exists(KEYWORDS_FILENAME)
-    
-def get_keywords_if_not_got():
-    if is_keywords_got():
-        logger.info("Keywords have already been got. Skipping.")
-        return
-    
-    endpoint = SERVER_ADDRESS + "/get_keywords"
-    try:
-        response = requests.get(endpoint)
-        if response.status_code == 200:
-            keywords = response.json().get("keywords")
-            logger.info("Received keywords from server: %s", keywords)
-            
-            os.makedirs(os.path.dirname(KEYWORDS_FILENAME), exist_ok=True)
-            with open(KEYWORDS_FILENAME, 'w') as file:
-                json.dump(keywords, file)
-            logger.info(f"Keywords file '{KEYWORDS_FILENAME}' has been created and written to.")
-        else:
-            logger.warning(f"Server returned status code: {response.status_code}")
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Failed to connect to server: {e}")
         
 def send_search_history_to_server(search_history):
     endpoint = SERVER_ADDRESS + "/recieve_search_history"

@@ -61,11 +61,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    window.addEventListener("load", (event) => { //TODO this does not attach fast enough, might need to deactivate button first? Also need to work on enter key
+    window.addEventListener("load", (event) => { //TODO Need to work on enter key
         const button = document.querySelector('.gsc-search-button-v2');
         const input = document.querySelector('input.gsc-input'); 
    
-        button.addEventListener('click', function(event) { 
+        button.addEventListener('click', function(event) {  
             const query = input.value;
             console.log("Search query:", query);
             handleSearch(query);
