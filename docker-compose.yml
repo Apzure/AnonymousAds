@@ -30,7 +30,7 @@ services:
     volumes:
       - dev-data:/app/fhe_directory
     deploy:
-      replicas: ${ENABLE_OPTIONAL_SERVICE:-0}
+      replicas: ${ENABLE_DEV_SERVICE:-0}
 
 volumes:
   dev-data:
