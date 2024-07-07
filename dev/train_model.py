@@ -11,26 +11,43 @@ from sklearn.model_selection import train_test_split
 import os
 import shutil
 from nltk.stem.porter import PorterStemmer
-from generate_data import KEYWORDS, NUM_CATEGORIES , process_text
 
-NUM_CATEGORIES = NUM_CATEGORIES
-NUM_KEYWORDS = len(KEYWORDS)
 
+NUM_CATEGORIES = 5
+NUM_KEYWORDS = 11
 
 FHE_FILE_PATH = "./fhe_directory"
 FHE_FILE_PATH_CLIENT = "./fhe_directory"
 FHE_FILE_PATH_SERVER = "./fhe_directory"
 TRAINING_DATA_PATH = './training_data.csv'
+REGEX = re.compile('[^a-zA-Z ]')
+STEMMER = PorterStemmer()
 
 df = pd.read_csv(TRAINING_DATA_PATH)
 column_labels = df.columns.tolist()
 
-KEYWORDS = column_labels[:-NUM_CATEGORIES]
 CATEGORIES = column_labels[-NUM_CATEGORIES:]
+KEYWORDS = column_labels[:-NUM_CATEGORIES]
+STEMMED_KEYWORDS = list(map(STEMMER.stem, KEYWORDS))
+
 X = df.values[:, :-NUM_CATEGORIES]
 y = df.values[:, -NUM_CATEGORIES:]
 
-print(X.shape, y.shape)
+def process_text(text):
+    global CATEGORIES
+    global REGEX
+    global STEMMER
+    global STEMMED_KEYWORDS
+    
+    text = text.replace("-", " ")
+    text = REGEX.sub('', text)
+    text = text.lower()
+    text = text.split()
+    text = list(map(STEMMER.stem, text))
+    
+    freq = Counter(text)
+    return [freq[category] for category in STEMMED_KEYWORDS]
+
 
 def clear_fhe_dir():
     if os.path.exists(FHE_FILE_PATH):
@@ -63,11 +80,6 @@ params = {
     "verbose" : True,
     "lr" : 1e-3,
 }
-
-
-
-
-
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25) 
