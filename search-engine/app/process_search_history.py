@@ -12,7 +12,7 @@ import requests
 import json
 import base64
 import logging 
-
+from .predict import get_new_prediction, display_predictions, clean_normalize_predictions
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -113,15 +113,19 @@ def send_search_history_to_server(search_history):
                 logger.error(str(e))
                 raise
             
-            # Combine categories and their respective predictions
-            predictions = [(x,y) for x, y in sorted(zip(categories, vector), key=lambda pair: pair[1], reverse=True)]
+            predictions = dict(zip(categories, vector))
+            predictions = clean_normalize_predictions(predictions)
             
             # Log predictions
-            logger.info("Predictions recieved:")
-            for x, y in predictions:
-                x = x.title()
-                logger.info(f"{x} has probability: {y}")
-                
+            logger.info("Predictions received:")
+            display_predictions(predictions)
+        
+            new_predictions = get_new_prediction(predictions)
+            logger.info("New predictions received:")
+            display_predictions(new_predictions)
+            
+            
+            
             return predictions
         else: 
             logger.warning(f"Server returned status code: {response.status_code}")

@@ -1,7 +1,7 @@
 from flask import render_template, request, jsonify
 from app import app
 from .key import send_key_to_server_if_not_sent
-from.process_search_history import init_keywords, process_search_history, send_search_history_to_server
+from .process_search_history import init_keywords, process_search_history, send_search_history_to_server
 import logging
 
 logging.basicConfig(level=logging.INFO)

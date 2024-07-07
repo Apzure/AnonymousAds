@@ -90,7 +90,7 @@ params = {
     "module__n_w_bits" : 4, 
     "module__n_a_bits" : 4,
     
-    "max_epochs": 100,
+    "max_epochs": 150,
     "verbose" : True,
     "lr" : 1e-3,
 }
