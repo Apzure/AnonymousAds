@@ -8,8 +8,8 @@ services:
       - "5000:5000"
     depends_on:
       - server
-    # volumes:
-      # - ./search-engine:/app
+    volumes:
+      - ./search-engine:/app
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
@@ -21,8 +21,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5001:5001"
-    volumes:
-      - dev-data:/app/fhe_directory:ro
     depends_on:
       - dev
 

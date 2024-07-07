@@ -140,21 +140,29 @@
         }
       })
       let ads = [];
+      let good_ads = [];
       ads.push(Object.keys(data).reduce((a, b) => data[a] > data[b] ? a : b)); // Best ad
-      var remainingAds = Object.keys(data).filter(ad => ad !== ads[0]);
-      ads.push(Object.keys(data).reduce((a, b) => data[a] > data[b] ? a : b)); // Next Best ad
-      remainingAds = Object.keys(data).filter(ad => ad !== ads[0]);
+      let remainingAds = Object.keys(data).filter(ad => !ads.includes(ad));
+      ads.push(remainingAds.reduce((a, b) => data[a] > data[b] && data[a] !== ads[0] ? a : b)); // Next Best ad
+      good_ads = ads.slice();
+      remainingAds = remainingAds.filter(ad => !ads.includes(ad));
       ads.push(remainingAds[Math.floor(Math.random() * remainingAds.length)]); // Noisy ad 1
-      remainingAds = remainingAds.filter(ad => ad !== ads[1]);
+      remainingAds = remainingAds.filter(ad => !ads.includes(ad));
       ads.push(remainingAds[Math.floor(Math.random() * remainingAds.length)]); // Noisy ad 2
       
+      let before = true;
       ads.forEach(imageUrl => {
         const img = document.createElement('img');
         img.src = "http://localhost:5001/image/" + imageUrl + "_1.jpg";
-        adsContainer.appendChild(img);
-        adsContainer.insertBefore(img, adsContainer.firstChild);
-        }
-      );
+        if (good_ads.includes(imageUrl)) {
+          if (before) {
+            adsContainer.appendChild(img);
+            before = false;
+          } else {
+            adsContainer.insertBefore(img, adsContainer.firstChild);
+          }
+        } 
+      });
     }
 
     displaySearchHistory();
