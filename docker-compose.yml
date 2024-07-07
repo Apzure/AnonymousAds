@@ -10,6 +10,7 @@ services:
       - server
     volumes:
       - dev-data:/app/fhe_directory:ro
+      # - ./search-engine:/app
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1

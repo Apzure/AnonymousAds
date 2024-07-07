@@ -1,8 +1,9 @@
-{% extends 'base.html' %} {% block title %}Search Engine{% endblock %} {% block
-content %}
+{% extends 'base.html' %} 
+{% block title %}Search Engine{% endblock %} 
+{% block content %}
 <div class="container">
   <button id="history-toggle" class="history-btn">
-    <span class="material-symbols-outlined"> history </span>
+    <span class="material-symbols-outlined">history</span>
   </button>
   <div class="sidebar" id="history-sidebar">
     <div class="history-list-container">
@@ -10,17 +11,31 @@ content %}
       <ul id="history-list"></ul>
     </div>
   </div>
-    <div class="search-container">
-      <h1><a href="#">Priv</a></h1>
-      <div class="google-search">
-        <div class="gcse-search"></div>
-      </div>
+  <div class="search-container">
+    <h1><a href="#">Priv</a></h1>
+    <div class="google-search">
+      <div class="gcse-search"></div>
     </div>
   </div>
-</div id='ads' class='ads-container'></div>
-{% endblock %} {% block scripts%}
+  <div id="ads" class="ads-container"></div>
+</div>
+{% endblock %} 
+
+{% block scripts %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    const historyToggle = document.getElementById("history-toggle");
+    const historySidebar = document.getElementById("history-sidebar");
+
+    historyToggle.addEventListener("click", function() {
+      historySidebar.classList.toggle("show");
+      if (historySidebar.classList.contains("show")) {
+        historyToggle.style.backgroundColor = "#f9f9f9"; // Match this to your sidebar color
+      } else {
+        historyToggle.style.backgroundColor = "white";
+      }
+    });
+
     function handleSearch(query) {
       if (query) {
         saveSearchQuery(query);
@@ -30,119 +45,110 @@ content %}
     }
 
     function saveSearchQuery(query) {
-      let searchHistory =
-        JSON.parse(localStorage.getItem("searchHistory")) || [];
+      let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
       searchHistory.push(query);
       localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
     }
 
     function sendSearchHistory() {
-      let searchHistory =
-        JSON.parse(localStorage.getItem("searchHistory")) || [];
-
+      let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
       const numToSend = 5;
-      if (searchHistory.length < numToSend) {
+      if (searchHistory.length % numToSend !== 0) {
         return;
       }
 
+      const queriesToSend = searchHistory.slice(-numToSend); // Get the last X queries
       fetch("/send_search_history", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          searchHistory: searchHistory.slice(0, numToSend),
-        }),
+        body: JSON.stringify({ searchHistory: queriesToSend }),
       })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Success:", data);
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        displayAds(data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
 
-          // This line will clear the search history (to be decided) TODO make it take effect immediately
-          localStorage.setItem(
-            "searchHistory",
-            JSON.stringify(searchHistory.slice(numToSend))
-          );
-          displaySearchHistory();
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
+      displaySearchHistory();
     }
 
     window.addEventListener("load", (event) => {
-        // Listening for form submit doesn't work, hence these two listeners
-        const input = document.querySelector('input.gsc-input'); 
-        const button = document.querySelector('.gsc-search-button-v2');
-  
-        input.addEventListener('keydown', function(event) {
-          if (event.key === 'Enter') {
-            const query = input.value;
-            handleSearch(query);
-          }
-        });
-        
-        button.addEventListener('click', function(event) {  
+      const input = document.querySelector('input.gsc-input');
+      const button = document.querySelector('.gsc-search-button-v2');
+
+      input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
           const query = input.value;
           handleSearch(query);
-        });
+        }
       });
 
-      const clearAllButton = document.getElementById("clear-all-history");
-      clearAllButton.addEventListener("click", clearAllHistory);
-    
-      function clearAllHistory() {
-        localStorage.removeItem("searchHistory");
-        displaySearchHistory();
-      }
-    
-      function displaySearchHistory() {
-        const searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
-        const historyList = document.getElementById("history-list");
-        historyList.innerHTML = "";
-    
-        searchHistory.forEach((query, index) => {
-          const li = document.createElement("li");
-          const querySpan = document.createElement("span");
-          querySpan.textContent = query;
-          
-          const clearButton = document.createElement("button");
-          clearButton.textContent = "×";
-          clearButton.classList.add("clear-item-btn");
-          clearButton.addEventListener("click", () => clearHistoryItem(index));
-    
-          li.appendChild(querySpan);
-          li.appendChild(clearButton);
-          historyList.appendChild(li);
-        });
-      }
-    
-      function clearHistoryItem(index) {
-        let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
-        searchHistory.splice(index, 1);
-        localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
-        displaySearchHistory();
-      }
+      button.addEventListener('click', function(event) {
+        const query = input.value;
+        handleSearch(query);
+      });
+    });
+
+    const clearAllButton = document.getElementById("clear-all-history");
+    clearAllButton.addEventListener("click", clearAllHistory);
+
+    function clearAllHistory() {
+      localStorage.removeItem("searchHistory");
+      displaySearchHistory();
+    }
+
+    function displaySearchHistory() {
+      const searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
+      const historyList = document.getElementById("history-list");
+      historyList.innerHTML = "";
+
+      searchHistory.forEach((query, index) => {
+        const li = document.createElement("li");
+        const querySpan = document.createElement("span");
+        querySpan.textContent = query;
+
+        const clearButton = document.createElement("button");
+        clearButton.textContent = "×";
+        clearButton.classList.add("clear-item-btn");
+        clearButton.addEventListener("click", () => clearHistoryItem(index));
+
+        li.appendChild(querySpan);
+        li.appendChild(clearButton);
+        historyList.appendChild(li);
+      });
+    }
+
+    function clearHistoryItem(index) {
+      let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
+      searchHistory.splice(index, 1);
+      localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+      displaySearchHistory();
+    }
 
     function displayAds(data) {
-      document.getElementById('ads').innerHTML = '';
+      const adsContainer = document.getElementById('ads');
+      adsContainer.innerHTML = '';
       let ads = [];
       ads.push(Object.keys(data).reduce((a, b) => data[a] > data[b] ? a : b)); // Best ad
-      var remainingAds = Object.keys(data).filter(ad => ad !== best_ad);
-      ads.push(remainingKeys[Math.floor(Math.random() * remainingKeys.length)]); // Noisy ad 1
-      var remainingAds = remainingAds.filter(ad => ad !== randomAd_1);
-      ads.push(remainingKeys[Math.floor(Math.random() * remainingKeys.length)]); // Noisy ad 2
+      const remainingAds = Object.keys(data).filter(ad => ad !== ads[0]);
+      ads.push(remainingAds[Math.floor(Math.random() * remainingAds.length)]); // Noisy ad 1
+      const remainingAdsAfterNoisy1 = remainingAds.filter(ad => ad !== ads[1]);
+      ads.push(remainingAdsAfterNoisy1[Math.floor(Math.random() * remainingAdsAfterNoisy1.length)]); // Noisy ad 2
+      
       ads.forEach(imageUrl => {
         const img = document.createElement('img');
         img.src = "../ad-images" + imageUrl + "_1.jpg";
-        imageContainer.appendChild(img);
+        adsContainer.appendChild(img);
       });
       // TODO: styling for the images
     }
 
-      // Initial display of search history
-      displaySearchHistory();
-    });
-  </script>
-  {% endblock%}
-  
+    displaySearchHistory();
+  });
+</script>
+{% endblock %}

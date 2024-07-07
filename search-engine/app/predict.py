@@ -71,6 +71,11 @@ def sort_predictions(predictions):
     return list(sorted(predictions.items(), key=lambda pair: pair[1], reverse=True))
     
 def display_predictions(predictions):
-    sorted_pred = sort_predictions(predictions)
-    for x, y in sorted_pred:
-        logger.info(f"{x.title()} has probability: {y}")
+    predictions = sort_predictions(predictions)
+    logger.info("Predictions recieved:")
+    logger.info("-" * 30) 
+    for i, (category, probability) in enumerate(predictions, 1):
+        category = category.title()
+        logger.info(f"{i}. {category:<10} Probability: {probability:.4f}")
+    logger.info("-" * 30)  
+    logger.info(f"Total predictions: {len(predictions)}")
