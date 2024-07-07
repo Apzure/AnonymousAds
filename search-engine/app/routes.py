@@ -1,6 +1,6 @@
 from flask import render_template, request, jsonify, send_from_directory
 from app import app
-from .key import send_key_to_server_if_not_sent
+from .key import send_key_to_server
 from .process_search_history import init_keywords, process_search_history, send_search_history_to_server
 import logging
 import random
@@ -21,7 +21,7 @@ def send_search_history():
     logging.info("Received search history: %s", search_history)
     
     init_keywords()
-    send_key_to_server_if_not_sent()
+    send_key_to_server()
     search_history_vector = process_search_history(search_history) 
     logging.info("Successfully processed search history")
     prediction = send_search_history_to_server(search_history_vector)

@@ -1,9 +1,7 @@
 import os
-import requests
-import json
 import logging
 import pickle
-import random
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -50,9 +48,12 @@ def get_new_prediction(curr_pred):
     logger.info(f"Total predictions: {num_req_made}")
     if old_pred_exists(curr_pred) and num_req_made != 1:
         old_pred = read_pred()
+        logger.info("OLD PRED: %s", old_pred)
+        logger.info("CURR PRED: %s", curr_pred)
         weight = 1 / (num_req_made + 1)
         for key in old_pred:
             curr_pred[key] += (1 - weight) * old_pred[key] + weight * curr_pred[key]
+
 
     curr_pred = clean_normalize_predictions(curr_pred)
     write_prediction(curr_pred)
@@ -68,9 +69,9 @@ def clean_normalize_predictions(predictions):
         sum_pred += predictions[category]
     
     if sum_pred <= 0:
-        rand_category = random.choice(list(predictions.keys()))
-        predictions[rand_category] = 1
-        sum_pred = 1
+        for category in predictions:
+            predictions[category] = 1
+            sum_pred += 1
 
     for category in predictions:
         predictions[category] /= sum_pred
