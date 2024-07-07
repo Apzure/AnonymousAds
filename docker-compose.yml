@@ -10,10 +10,7 @@ services:
       - server
     # volumes:
       # - ./search-engine:/app
-    environment:
-      - FLASK_ENV=development
-      - FLASK_DEBUG=1
-    command: flask run --host=0.0.0.0 --port=5000 --reload
+    command: flask run --host=0.0.0.0 --port=5000
 
   server:
     build:
