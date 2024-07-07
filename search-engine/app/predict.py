@@ -46,6 +46,7 @@ def get_new_prediction(curr_pred):
     global num_req_made
     
     num_req_made += 1
+    logger.info(f"Total predictions: {num_req_made}")
     if old_pred_exists(curr_pred):
         old_pred = read_pred()
         weight = 1 / (num_req_made + 1)
@@ -78,4 +79,3 @@ def display_predictions(predictions):
         category = category.title()
         logger.info(f"{i}. {category:<10} Probability: {probability:.4f}")
     logger.info("-" * 30)  
-    logger.info(f"Total predictions: {len(predictions)}")
