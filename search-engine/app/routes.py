@@ -34,39 +34,50 @@ def send_ads():
     
     data = request.json.get('prediction')
     if not data:
-        logging.error("No prediction data received")
+        logging.error("No prediction data received in request")
         return jsonify({"error": "No prediction data"}), 400
+    
+    logging.info(f"Received prediction data with {len(data)} categories")
     
     sorted_ads = sorted(data.items(), key=lambda item: item[1], reverse=True)
     best_ad, best_prob = sorted_ads[0]
     ads = [best_ad]
+    logging.info(f"Best ad selected: {best_ad} with probability {best_prob:.4f}")
     
     # Determine if the second-best ad should be included based on the probability difference
-    if len(sorted_ads) > 1 and best_prob - sorted_ads[1][1] < 0.1:  # Threshold for showing the second ad
-        ads.append(sorted_ads[1][0])
+    if len(sorted_ads) > 1:
+        second_best_ad, second_best_prob = sorted_ads[1]
+        if second_best_prob >= 0.2:  # Threshold for showing the second ad
+            ads.append(second_best_ad)
+            logging.info(f"Second-best ad included: {second_best_ad} with probability {second_best_prob:.4f}")
+        else:
+            logging.info(f"Second-best ad not included.")
     
     good_ads = list(ads)
-    logging.info("Successfully selected best ads")
+    logging.info(f"Successfully selected {len(good_ads)} best ad(s)")
     
     remaining_ads = [ad for ad, _ in sorted_ads if ad not in ads]
-    if remaining_ads:
-        noisy_ad_1 = random.choice(remaining_ads)
-        ads.append(noisy_ad_1)
-        remaining_ads = [ad for ad in remaining_ads if ad != noisy_ad_1]
-    if remaining_ads:
-        noisy_ad_2 = random.choice(remaining_ads)
-        ads.append(noisy_ad_2)
+    for _ in range(2):
+        if remaining_ads:
+            noisy_ad = random.choice(remaining_ads)
+            ads.append(noisy_ad)
+            remaining_ads.remove(noisy_ad)
+            logging.info(f"Added noisy ad: {noisy_ad}")
     
-    logging.info("Successfully added noisy ads")
+    logging.info(f"Total ads selected (including noisy): {len(ads)}")
     
     imageURLs = [f"http://server:5001/image/{cat}_1.jpg" for cat in ads]
     for url in imageURLs:
         try:
-            requests.get(url)
+            response = requests.get(url)
+            response.raise_for_status()
+            logging.info(f"Successfully retrieved image: {url}")
         except requests.exceptions.RequestException as e:
-            logging.error("Error getting image: %s", e)
+            logging.error(f"Error getting image {url}: {str(e)}")
     
     goodImageURLs = [f"http://localhost:5001/image/{cat}_1.jpg" for cat in good_ads]
+    logging.info(f"Returning {len(goodImageURLs)} good image URLs")
+    
     logging.info("Completed send_ads process")
     logging.info("-" * 30)
     return jsonify(goodImageURLs), 200
