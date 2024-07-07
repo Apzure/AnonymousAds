@@ -23,7 +23,6 @@ def send_search_history():
     send_key_to_server_if_not_sent()
     search_history_vector = process_search_history(search_history) 
     prediction = send_search_history_to_server(search_history_vector)
-    logging.info("Successfully predicted")
     return jsonify(prediction), 200
 
 @app.route('/image/<filename>')

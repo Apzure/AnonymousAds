@@ -19,6 +19,7 @@ KEYWORDS_FILENAME = "./tmp/keywords.txt"
 def ensure_key_exists():
     os.makedirs(os.path.dirname(KEY_FILENAME), exist_ok=True)
     if not os.path.exists(KEY_FILENAME) or os.path.getsize(KEY_FILENAME) == 0:
+        logger.info("Generating new key")
         key = generate_key()
         with open(KEY_FILENAME, 'wb') as file:
             pickle.dump(key, file)
@@ -66,6 +67,7 @@ def send_key_to_server(key):
         return False
     
 def send_key_to_server_if_not_sent():
+    logger.info("Starting process to generate and send key to server")
     if is_key_sent():
         logger.info("Key has already been sent to server. Skipping.")
         return

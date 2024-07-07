@@ -48,11 +48,13 @@ def recieve_search_history():
     if data and 'search_history' in data:
         encrypted_input = data['search_history']
         encrypted_input = base64.b64decode(encrypted_input)
-        logging.info("Server has received search history")
+        logging.info("Server has received encrypted search history")
         
         try: 
-            logging.info("Processing encrypted search history...")
+            logging.info("Applying ML model to generate predictions using encrypted search history...")
             encrypted_result = server.run(encrypted_input, serialized_evaluation_keys)
+            logging.info("Successfully generated predictions")
+            
             encoded_bytes = base64.b64encode(encrypted_result).decode('utf-8')
             
             # Get categories
@@ -70,6 +72,7 @@ def recieve_search_history():
                 logging.error(f"Error reading keywords file: {str(e)}")
                 return jsonify({"error": "Internal server error"}), 500
 
+            logging.info("Sending back encrypted prediction and categories")
             return jsonify({"status": "success", "prediction": encoded_bytes, "categories": categories}), 200
     
         except Exception as e:
