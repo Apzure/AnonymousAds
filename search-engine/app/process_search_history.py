@@ -118,9 +118,12 @@ def send_search_history_to_server(search_history):
             
             # Log predictions
             logger.info("Predictions recieved:")
-            for x, y in predictions:
-                x = x.title()
-                logger.info(f"{x} has probability: {y}")
+            logger.info("-" * 30) 
+            for i, (category, probability) in enumerate(predictions, 1):
+                category = category.title()
+                logger.info(f"{i}. {category:<10} Probability: {probability:.4f}")
+            logger.info("-" * 30)  
+            logger.info(f"Total predictions: {len(predictions)}")
                 
             return predictions
         else: 
