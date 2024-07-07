@@ -133,32 +133,32 @@
     }
 
     function displayAds(data) {
-      const adsContainer = document.getElementById('inner-search');
-      Array.from(adsContainer.children).forEach(child => {
-        if (child.tagName === 'IMG') {
-          adsContainer.removeChild(child);
-        }
+      fetch("/get_ads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prediction: data }),
       })
-      let ads = [];
-      ads.push(Object.keys(data).reduce((a, b) => data[a] > data[b] ? a : b)); // Best ad
-      const remainingAds = Object.keys(data).filter(ad => ad !== ads[0]);
-      ads.push(remainingAds[Math.floor(Math.random() * remainingAds.length)]); // Noisy ad 1
-      const remainingAdsAfterNoisy1 = remainingAds.filter(ad => ad !== ads[1]);
-      ads.push(remainingAdsAfterNoisy1[Math.floor(Math.random() * remainingAdsAfterNoisy1.length)]); // Noisy ad 2
-      
-      var i = Math.floor(Math.random() * 2) + 1;
-      ads.forEach(imageUrl => {
-        const img = document.createElement('img');
-        img.src = "http://localhost:5000/image/" + imageUrl + "_1.jpg";
-        if (i >= 3) {
-          adsContainer.appendChild(img);
-        } else {
-          adsContainer.insertBefore(img, adsContainer.firstChild);
-        }
-        i++;
+      .then((response) => response.json())
+      .then((data) => {
+        const adsContainer = document.getElementById('inner-search');
+        Array.from(adsContainer.children).forEach(child => {
+          if (child.tagName === 'IMG') {
+            adsContainer.removeChild(child);
+          }
+        })
+        const ad_1 = document.createElement('img');
+        ad_1.src = data[0];
+        const ad_2 = document.createElement('img');
+        ad_2.src = data[1];
+        adsContainer.appendChild(ad_1);
+        adsContainer.insertBefore(ad_2, adsContainer.firstChild);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
     }
-
     displaySearchHistory();
   });
 </script>
