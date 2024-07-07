@@ -159,6 +159,28 @@ h1 {
   max-width: 1000px;
 }
 
+.inner-search-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.ads-container {
+  display: flex;
+  justify-content: center;
+  gap: 200px;
+  margin-top: 20px;
+}
+
+.ads-container img {
+  width: 200px;
+}
+
+.inner-search-container img {
+  width: 200px;
+  height: 200px;
+}
+
 
 .gsc-results-wrapper-visible {
   width: 100%;
