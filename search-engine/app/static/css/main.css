@@ -7,17 +7,10 @@
   box-sizing: border-box;
 }
 
-/* Hide scrollbar */
-/* body {
-  overflow: hidden;
-} */
-
-/* Container styling */
 .container {
   font-family: Arial, sans-serif;
 }
 
-/* Search container styling */
 .search-container {
   display: flex;
   flex-direction: column;
@@ -33,64 +26,116 @@
   color: #4285f4;
 }
 
-/* Header styling */
 h1 {
   margin-bottom: 30px;
   font-size: 3rem;
   color: #4285f4;
 }
 
-/* History menu styling */
-.dropdown {
-  float: left;
-}
+/* TODO: "Search history" word title become bigger with an empty search history, it should be same size */
 
-.dropdown button {
-  background-color: white;
-  color: black;
-  padding: 1rem 1rem;
+.history-btn {
+  position: fixed;
+  top: 10px;
+  left: 10px;
   border: none;
   cursor: pointer;
-}
-
-.dropdown ul {
-  list-style: none;
-  display: block;
+  z-index: 1000;
   color: black;
-  text-decoration: none;
-  padding: 10px 15px;
+  padding: 0; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; 
+  height: 40px; 
+  transition: background-color 0.2s ease;
+  background-color: white;
 }
 
-.dropdown .content {
-  display: none;
-  position: absolute;
-  left: 1.5%;
-  top: 55px;
-  background-color: #e9eefb;
-  min-width: 100px;
-  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
-  border-radius: 5%;
-  padding: 1rem;
-  z-index: 2;
-}
-/* TODO: "Search history" word title become bigger with an empty search history, it should be same size */
-.dropdown:hover .content {
-  display: block;
+.history-btn .material-symbols-outlined {
+  font-size: 24px; 
 }
 
-.dropdown:hover button {
-  color: grey;
+.sidebar {
+  position: fixed;
+  left: -300px;
+  top: 0;
+  width: 300px;
+  height: 100%;
+  background-color: #f9f9f9;
+  box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.5);
+  transition: left 0.3s ease;
+  z-index: 999; 
+  display: flex;
+  flex-direction: column;
+}
+
+.history-list-container {
+  overflow-y: auto;
+  height: calc(100% - 60px);
+  margin-top: 60px;
+  padding-top: 10px;
+}
+
+.sidebar.show {
+  left: 0;
 }
 
 #history-list {
-  padding: 0;
+  list-style-type: none;
+  padding: 10px 20px;
+  margin: 0;
+} 
+
+#history-list li {
+  padding: 8px 16px; 
+  font-size: 14px; 
+  border-bottom: 1px solid #ddd;
 }
 
-#history-list > li {
-  padding: 10px 0;
+#history-list li:hover {
+  background-color: #f1f1f1;
 }
 
-/* Search container styling */
+#history-list li + li {
+  padding-top: 2px;
+}
+
+.clear-all-btn, .clear-item-btn {
+  background-color: #f9f9f9; 
+  color: #333; 
+  border: 1px solid #ddd; 
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.clear-all-btn {
+  margin: 10px;
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.clear-item-btn {
+  margin-left: 10px;
+  padding: 2px 6px;
+  font-size: 12px;
+}
+
+.clear-all-btn:hover, .clear-item-btn:hover {
+  background-color: #f44336;
+  color: white; 
+}
+
+#history-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-bottom: 1px solid #ddd;
+}
+
+
 .google-search {
   width: 100%;
   max-width: 2000px;
@@ -103,7 +148,7 @@ h1 {
   box-shadow: 0 0 10px rgba(66, 133, 244, 0.3);
 }
 
-/* Custom search button styling */
+
 .gcse-search button.gsc-search-button {
   display: none;
 }
@@ -114,7 +159,7 @@ h1 {
   max-width: 1000px;
 }
 
-/* Search results styling */
+
 .gsc-results-wrapper-visible {
   width: 100%;
   max-width: 1500px;
@@ -126,9 +171,9 @@ h1 {
   padding: 20px;
 }
 
-/* Result item styling */
+
 .gsc-result {
-  padding: 20px; /* Increased padding */
+  padding: 20px; 
   border-bottom: 1px solid #dfe1e5;
 }
 
@@ -136,20 +181,20 @@ h1 {
   border-bottom: none;
 }
 
-/* Result title styling */
+
 .gsc-title {
   color: #1a0dab;
-  font-size: 1.5rem; /* Increased font size */
+  font-size: 1.5rem; 
 }
 
-/* Result snippet styling */
+
 .gsc-snippet {
   color: #4d5156;
-  font-size: 1.2rem; /* Increased font size */
+  font-size: 1.2rem; 
 }
 
-/* URL styling */
+
 .gsc-url {
   color: #006621;
-  font-size: 1rem; /* Increased font size */
+  font-size: 1rem; 
 }

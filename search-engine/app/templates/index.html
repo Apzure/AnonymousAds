@@ -1,105 +1,144 @@
 {% extends 'base.html' %} {% block title %}Search Engine{% endblock %} {% block
-content %}
-<div class="container">
-  <div class="dropdown">
-    <button><span class="material-symbols-outlined"> history </span></button>
-    <div class="content">
-      <h2>Search History</h2>
-      <ul id="history-list"></ul>
+  content %}
+  <div class="container">
+    <button id="history-toggle" class="history-btn">
+      <span class="material-symbols-outlined"> history </span>
+    </button>
+    <div class="sidebar" id="history-sidebar">
+      <div class="history-list-container">
+        <button id="clear-all-history" class="clear-all-btn">Clear All History</button>
+        <ul id="history-list"></ul>
+      </div>
     </div>
-  </div>
-  <div class="search-container">
-    <h1><a href="#">Priv</a></h1>
-    <div class="google-search">
-      <div class="gcse-search"></div>
+      <div class="search-container">
+        <h1><a href="#">Priv</a></h1>
+        <div class="google-search">
+          <div class="gcse-search"></div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-{% endblock %} {% block scripts%}
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    function handleSearch(query) {
-      if (query) {
-        saveSearchQuery(query);
-        displaySearchHistory();
-        sendSearchHistory();
-      }
-    }
-
-    function saveSearchQuery(query) {
-      let searchHistory =
-        JSON.parse(localStorage.getItem("searchHistory")) || [];
-      searchHistory.push(query);
-      localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
-    }
-
-    function sendSearchHistory() {
-      let searchHistory =
-        JSON.parse(localStorage.getItem("searchHistory")) || [];
-
-      const numToSend = 5;
-      if (searchHistory.length < numToSend) {
-        return;
-      }
-
-      fetch("/send_search_history", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          searchHistory: searchHistory.slice(0, numToSend),
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Success:", data);
-
-          // This line will clear the search history (to be decided) TODO make it take effect immediately
-          localStorage.setItem(
-            "searchHistory",
-            JSON.stringify(searchHistory.slice(numToSend))
-          );
+  {% endblock %} {% block scripts%}
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const historyToggle = document.getElementById("history-toggle");
+      const historySidebar = document.getElementById("history-sidebar");
+      
+      historyToggle.addEventListener("click", function() {
+        historySidebar.classList.toggle("show");
+        
+        if (historySidebar.classList.contains("show")) {
+          // Sidebar is open, change button background to match sidebar
+          historyToggle.style.backgroundColor = "#f9f9f9"; // Match this to your sidebar color
+        } else {
+          // Sidebar is closed, change button background back to white
+          historyToggle.style.backgroundColor = "white";
+        }
+      });
+  
+      function handleSearch(query) {
+        if (query) {
+          saveSearchQuery(query);
           displaySearchHistory();
+          sendSearchHistory();
+        }
+      }
+  
+      function saveSearchQuery(query) {
+        let searchHistory =
+          JSON.parse(localStorage.getItem("searchHistory")) || [];
+        searchHistory.push(query);
+        localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+      }
+  
+      function sendSearchHistory() {
+        let searchHistory =
+          JSON.parse(localStorage.getItem("searchHistory")) || [];
+  
+        const numToSend = 5;
+        if (searchHistory.length % numToSend !== 0) {
+          return;
+        }
+  
+        const queriesToSend = searchHistory.slice(-numToSend); // Get the last X queries
+  
+        fetch("/send_search_history", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            searchHistory: queriesToSend,
+          }),
         })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    }
-
-    window.addEventListener("load", (event) => {
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Success:", data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+  
+        // Update the displayed search history
+        displaySearchHistory();
+      }
+  
+      window.addEventListener("load", (event) => {
         // Listening for form submit doesn't work, hence these two listeners
         const input = document.querySelector('input.gsc-input'); 
         const button = document.querySelector('.gsc-search-button-v2');
-
+  
         input.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                const query = input.value;
-                handleSearch(query);
-            }
-        });
-            
-        button.addEventListener('click', function(event) {  
+          if (event.key === 'Enter') {
             const query = input.value;
             handleSearch(query);
+          }
         });
-    });
-
-    function displaySearchHistory() {
-      const searchHistory =
-        JSON.parse(localStorage.getItem("searchHistory")) || [];
-      const historyList = document.getElementById("history-list");
-      historyList.innerHTML = "";
-
-      searchHistory.forEach((query) => {
-        const li = document.createElement("li");
-        li.textContent = query;
-        historyList.appendChild(li);
+        
+        button.addEventListener('click', function(event) {  
+          const query = input.value;
+          handleSearch(query);
+        });
       });
-    }
 
-    // Initial display of search history
-    displaySearchHistory();
-  });
-</script>
-{% endblock%}
+      const clearAllButton = document.getElementById("clear-all-history");
+      clearAllButton.addEventListener("click", clearAllHistory);
+    
+      function clearAllHistory() {
+        localStorage.removeItem("searchHistory");
+        displaySearchHistory();
+      }
+    
+      function displaySearchHistory() {
+        const searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
+        const historyList = document.getElementById("history-list");
+        historyList.innerHTML = "";
+    
+        searchHistory.forEach((query, index) => {
+          const li = document.createElement("li");
+          const querySpan = document.createElement("span");
+          querySpan.textContent = query;
+          
+          const clearButton = document.createElement("button");
+          clearButton.textContent = "×";
+          clearButton.classList.add("clear-item-btn");
+          clearButton.addEventListener("click", () => clearHistoryItem(index));
+    
+          li.appendChild(querySpan);
+          li.appendChild(clearButton);
+          historyList.appendChild(li);
+        });
+      }
+    
+      function clearHistoryItem(index) {
+        let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
+        searchHistory.splice(index, 1);
+        localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+        displaySearchHistory();
+      }
+
+      // Initial display of search history
+      displaySearchHistory();
+    });
+  </script>
+  {% endblock%}
+  
