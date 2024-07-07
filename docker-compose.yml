@@ -8,8 +8,7 @@ services:
       - "5000:5000"
     depends_on:
       - server
-    volumes:
-      - dev-data:/app/fhe_directory:ro
+    # volumes:
       # - ./search-engine:/app
     environment:
       - FLASK_ENV=development
@@ -20,8 +19,6 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    volumes:
-      - dev-data:/app/fhe_directory:ro
     depends_on:
       - dev
 
@@ -29,10 +26,6 @@ services:
     build:
       context: ./dev
       dockerfile: Dockerfile
-    volumes:
-      - dev-data:/app/fhe_directory
     deploy:
       replicas: ${ENABLE_DEV_SERVICE:-0}
 
-volumes:
-  dev-data:

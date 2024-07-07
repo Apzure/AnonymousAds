@@ -13,11 +13,13 @@
   </div>
   <div class="search-container">
     <h1><a href="#">Priv</a></h1>
-    <div class="google-search">
-      <div class="gcse-search"></div>
-    </div>
+    <div id="ads" class="ads-container"></div>
+  <div id="inner-search" class="inner-search-container">
+      <div class="google-search">
+        <div class="gcse-search"></div>
+      </div>
   </div>
-  <div id="ads" class="ads-container"></div>
+  </div>
 </div>
 {% endblock %} 
 
@@ -30,7 +32,7 @@
     historyToggle.addEventListener("click", function() {
       historySidebar.classList.toggle("show");
       if (historySidebar.classList.contains("show")) {
-        historyToggle.style.backgroundColor = "#f9f9f9"; // Match this to your sidebar color
+        historyToggle.style.backgroundColor = "#f9f9f9"; 
       } else {
         historyToggle.style.backgroundColor = "white";
       }
@@ -131,8 +133,12 @@
     }
 
     function displayAds(data) {
-      const adsContainer = document.getElementById('ads');
-      adsContainer.innerHTML = '';
+      const adsContainer = document.getElementById('inner-search');
+      Array.from(adsContainer.children).forEach(child => {
+        if (child.tagName === 'IMG') {
+          adsContainer.removeChild(child);
+        }
+      })
       let ads = [];
       ads.push(Object.keys(data).reduce((a, b) => data[a] > data[b] ? a : b)); // Best ad
       const remainingAds = Object.keys(data).filter(ad => ad !== ads[0]);
@@ -140,12 +146,17 @@
       const remainingAdsAfterNoisy1 = remainingAds.filter(ad => ad !== ads[1]);
       ads.push(remainingAdsAfterNoisy1[Math.floor(Math.random() * remainingAdsAfterNoisy1.length)]); // Noisy ad 2
       
+      var i = Math.floor(Math.random() * 2) + 1;
       ads.forEach(imageUrl => {
         const img = document.createElement('img');
-        img.src = "../ad-images" + imageUrl + "_1.jpg";
-        adsContainer.appendChild(img);
+        img.src = "http://localhost:5000/image/" + imageUrl + "_1.jpg";
+        if (i >= 3) {
+          adsContainer.appendChild(img);
+        } else {
+          adsContainer.insertBefore(img, adsContainer.firstChild);
+        }
+        i++;
       });
-      // TODO: styling for the images
     }
 
     displaySearchHistory();

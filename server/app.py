@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import requests
 import logging
 import os
@@ -100,7 +100,7 @@ def get_keywords():
     except Exception as e:
         logging.error(f"Error reading keywords file: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
-    
+
 
 if __name__ == '__main__':
     app.run(port=5001, debug=True, host='0.0.0.0')

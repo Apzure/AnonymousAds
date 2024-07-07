@@ -32,7 +32,6 @@ h1 {
   color: #4285f4;
 }
 
-/* TODO: "Search history" word title become bigger with an empty search history, it should be same size */
 
 .history-btn {
   position: fixed;
@@ -102,11 +101,17 @@ h1 {
 }
 
 .clear-all-btn, .clear-item-btn {
-  background-color: #f9f9f9; 
-  color: #333; 
-  border: 1px solid #ddd; 
+  color: #555; /* More subtle color */
+  background-color: #f0f0f0; /* Subtle background color */
+  border: none;
+  padding: 5px 10px;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.clear-all-btn:hover, .clear-item-btn:hover {
+  color: #333; /* Slightly darker on hover */
+  background-color: #e0e0e0; /* Slightly darker background on hover */
 }
 
 .clear-all-btn {
@@ -119,11 +124,6 @@ h1 {
   margin-left: 10px;
   padding: 2px 6px;
   font-size: 12px;
-}
-
-.clear-all-btn:hover, .clear-item-btn:hover {
-  background-color: #f44336;
-  color: white; 
 }
 
 #history-list li {
@@ -157,6 +157,28 @@ h1 {
   width: 100%;
   min-width: 700px;
   max-width: 1000px;
+}
+
+.inner-search-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.ads-container {
+  display: flex;
+  justify-content: center;
+  gap: 200px;
+  margin-top: 20px;
+}
+
+.ads-container img {
+  width: 200px;
+}
+
+.inner-search-container img {
+  width: 200px;
+  height: 200px;
 }
 
 
