@@ -27,6 +27,3 @@ def send_search_history():
     logging.info("Successfully predicted")
     return jsonify(prediction), 200
 
-@app.route('/image/<filename>')
-def send_image(filename):
-    return send_from_directory('ad-images', filename)
