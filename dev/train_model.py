@@ -83,7 +83,7 @@ def clear_fhe_dir():
 n_inputs = len(KEYWORDS)
 n_outputs = NUM_CATEGORIES
 params = {
-    "module__n_layers": 5,
+    "module__n_layers": 3,
     "module__activation_function" : nn.ReLU,
     "module__n_hidden_neurons_multiplier" : 4,
     
