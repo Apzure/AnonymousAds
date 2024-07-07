@@ -23,4 +23,4 @@ def send_search_history():
     search_history_vector = process_search_history(search_history) 
     logging.info("Successfully processed search history")
     prediction = send_search_history_to_server(search_history_vector)
-    return jsonify({"message": "Search history processed and sent successfully"}), 200
+    return jsonify(prediction), 200

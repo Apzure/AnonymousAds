@@ -14,7 +14,7 @@ content %}
       <div class="gcse-search"></div>
     </div>
   </div>
-</div>
+</div id='ads' class='ads-container'></div>
 {% endblock %} {% block scripts%}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
@@ -61,6 +61,7 @@ content %}
             JSON.stringify(searchHistory.slice(numToSend))
           );
           displaySearchHistory();
+          displayAds(data);
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -96,6 +97,22 @@ content %}
         li.textContent = query;
         historyList.appendChild(li);
       });
+    }
+
+    function displayAds(data) {
+      document.getElementById('ads').innerHTML = '';
+      let ads = [];
+      ads.push(Object.keys(data).reduce((a, b) => data[a] > data[b] ? a : b)); // Best ad
+      var remainingAds = Object.keys(data).filter(ad => ad !== best_ad);
+      ads.push(remainingKeys[Math.floor(Math.random() * remainingKeys.length)]); // Noisy ad 1
+      var remainingAds = remainingAds.filter(ad => ad !== randomAd_1);
+      ads.push(remainingKeys[Math.floor(Math.random() * remainingKeys.length)]); // Noisy ad 2
+      ads.forEach(imageUrl => {
+        const img = document.createElement('img');
+        img.src = "../ad-images" + imageUrl + "_1.jpg";
+        imageContainer.appendChild(img);
+      });
+      // TODO: styling for the images
     }
 
     // Initial display of search history

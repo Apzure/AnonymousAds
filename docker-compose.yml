@@ -21,6 +21,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - dev-data:/app/fhe_directory:ro
+    depends_on:
+      - dev
 
   dev:
     build:
