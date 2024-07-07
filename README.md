@@ -4,7 +4,7 @@
 <h3 align="center">AnonymousAds</h3>
 
   <p align="center">
-    Targetted ads without user tracking!
+    Targeted ads without user tracking!
     <br />
   </p>
 </div>
@@ -36,11 +36,8 @@
 
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
-
-AnonymousAds is a web application that serves targeted advertising to users, without compromising user privacy.
+AnonymousAds is a web application that serves targeted advertising to users, without compromising user privacy. It uses fully homomorphic encryption (FHE) and noise injection to allow for these ads to be served. For more information, you can watch our team's video. This project
+is a submission to TikTok TechJam 2024. 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -57,12 +54,25 @@ AnonymousAds is a web application that serves targeted advertising to users, wit
 
 ### Pre-Requisites
 
-The dev container contains all files and code required to generate pre-requisites. 
+The `dev` container contains all files and code required to generate pre-requisites. 
 
+1. The ML model is fitted on clear training data. 
+2. The model is compiled and then used to generate `server.zip` and `client.zip` in the `dev/fhe_directory/` directory
 
+### Protocol
 
+Fully Homomorphic Encryption (provided by the Concrete-ML library) allows us to apply functions to encrypted data, for them to be in effect,
+when decryption takes place later. This allows encryption and decryption to be entirely on the local machine, and yet allow the encrypted data
+to be processed on an external machine. As a proof of concept, this project uses FHE to serve targeted advertising to end-users, while ensuring
+the privacy of their search history. 
 
-
+1. The `search-engine` generates public keys and sends it to the `server`
+2. The user inputs 5 search queries into the `search-engine`
+3. The search queries is processed into vector, encrypted and is sent to `server`
+4. The `server` takes this input runs the model, and sends the still encrypted predictions back to the `search-engine`
+5. The `search-engine` decrypts the predictions and updates its predictions. 
+7. The `search-engine` makes a request to the `server` for ads, adding noise to the request, obfuscating the predictions
+8. The `search-engine` selects the relevant ads from this set of ads, and serves the targeted ads to the user.
 
 <!-- GETTING STARTED -->
 
@@ -110,7 +120,7 @@ We recommend having at least 6GB of Disk Space and 2GB of RAM.
 
 <!-- INSERT SCREENSHOT OF QUERY PAGE HERE + NO ADS-->
 
-3. Every 5 queries, the page would be automatically updated with new ads based on your search results. It would take 5-10 seconds for the ads to be updated.
+3. Every 5 queries, the page would be automatically updated with new ads based on your search results. It would take 5-10 seconds for the ads to be updated. See [Queries and Keywords](#queries-and-keywords) for more information.
 
 <!-- INSERT SCREENSHOT OF QUERY PAGE HERE + ADS-->
 
@@ -121,6 +131,30 @@ We recommend having at least 6GB of Disk Space and 2GB of RAM.
 5. You view the logs on Docker Desktop for more information. 
 
 <!-- INSERT GIF OF DOCKER-->
+
+### Queries and Keywords 
+
+As you input more queries, the search-engine would keep track of and update your preferences, using a Bayesian update scheme. This means that initially, the search-engine would update its predictions by a greater magnitude as more information is inputted. Over time, as more queries are entered, the model would stabilize into a set of predictions, and the ads displayed would not change as much. 
+
+Include these keywords in your search queries for them to be categorized by the ML model. Your queries can include punctuations and words other than the keywords. The keywords themselves are not case-sensitive and you can include different words with the same "stem" as the keyword for them to be counted too. See [nltk documentation](https://www.nltk.org/howto/stem.html#unit-tests-for-the-porter-stemmer) for more about stemming.
+
+Example: "games" shares the same stem "gam" as "gaming" which is a keyword, so "games" would be picked up by the model. 
+
+#### Sports
+sports, fitness, athletics, training, running, gear, gym, exercise, sportswear, outdoors, wellness
+
+#### Food
+food, cuisine, gourmet, organic, recipes, delivery, dining, snacks, cooking, restaurants, healthy
+
+#### Music
+music, concerts, streaming, instruments, bands, festivals, songs, albums, lessons, dj, sound
+
+#### Gaming
+gaming, consoles, accessories, esports, multiplayer, virtual, pc, development, merchandise, livestream, communities
+
+#### TV 
+tv, dramas, shows, smart, reviews, theater, cable, series, reality, channels, binge, sports, food, music, gaming, tv
+
 
 ### Training the model
 
@@ -142,38 +176,6 @@ As described in the methodology above, the `server.zip` and `client.zip` files a
 
 ## Acknowledgments
 
-We used royalty-free stock photos in our application. For more information, see `credits.txt` in our repo.
+We used royalty-free stock photos in our application. For more information, see [`docs/credits.txt`](docs/credit.txt) in our repo.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-# Anonymous Ads
-
-1. Generates User Data (collect and compile search engine results, tiktok)
-2. Encryption
-3. Send to external Server [do we have to implement this?]
-4. Apply transformations to process it into encrypted Tags, Categories, Keywords that help determine what ads to show a specific user
-5. Send back to the user
-6. Decryption
-7. Add dummy tags and request the set of ads from TikTok
-8. Display selected ads, with the real tags to the user
-
-9. - On start-up Concrete ML model is trained on clear data on server side
-   - Client generates public keys and sends to server
-10. Search-Engine FrontEnd
-    - Your Search History, sends after every 10 Requests / Button
-11. ## Encryption and send to server
-12. Apply Transformations on the server-side
-13. Send back transformed data along with set of all tags to user
-14. Decryption
-15. User randomly selects dummy tags from the set of all tags
-16. User requests ads from the server that include these tags
-
-    - Concrete ML model is trained and compiled on clear data on dev side using the FHEModelDev class
-
-    - Client generates public keys and sends to server
-    - Client inputs search queries and this is saved
-    - Search History is converted to "input" is sent to server
-    - Server takes input and uses model to predict tags (output is encrypted)
-    - Server sends encrypted prediction to Client and set of all tags
-    - Client decrypts prediction, and adds noise to the prediction
-    - Server gets ads
