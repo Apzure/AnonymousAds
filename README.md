@@ -1,10 +1,10 @@
 <!-- PROJECT LOGO -->
 <br />
 
-<h3 align="center">project_title</h3>
+<h3 align="center">AnonymousAds</h3>
 
   <p align="center">
-    project_description
+    Targetted ads without user tracking!
     <br />
   </p>
 </div>
@@ -100,9 +100,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 ## Acknowledgments
 
-- []()
-- []()
-- []()
+We used free stock photos in our application. For more information, see `credits.txt` in our repo.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -137,8 +135,3 @@ _For more examples, please refer to the [Documentation](https://example.com)_
     - Server sends encrypted prediction to Client and set of all tags
     - Client decrypts prediction, and adds noise to the prediction
     - Server gets ads
-
-Dependencies:
-
-- Flask
-- ConcreteML
