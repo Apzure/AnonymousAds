@@ -25,8 +25,8 @@ STEMMER = PorterStemmer()
 STEMMED_KEYWORDS = list(map(STEMMER.stem, KEYWORDS))
 FILE_PATH = './training_data.txt'
 FHE_FILE_PATH = "./fhe_directory"
-FHE_FILE_PATH_CLIENT = "./client"
-FHE_FILE_PATH_SERVER = "./server"
+FHE_FILE_PATH_CLIENT = "./fhe_directory"
+FHE_FILE_PATH_SERVER = "./fhe_directory"
 
 def read_file_to_array(file_path):
     with open(file_path, 'r') as file:
@@ -61,7 +61,6 @@ def get_training_data(X):
     
     y = np.apply_along_axis(non_linear_fn, axis=1, arr=X)
     y = normalize(y, axis=1, norm='l1')
-    
     return train_test_split(X, y, random_state=41, test_size=0.25) # REMOVE RANDOM STATE LATER AFTER MODEL HAS BEEN SETTLED ON
 
 def clear_fhe_dir():
@@ -132,11 +131,15 @@ dev = FHEModelDev(path_dir=FHE_FILE_PATH, model=concrete_regressor)
 clear_fhe_dir()
 dev.save()
 
+######## FURTHER TESTING #########
 
+text = "Food foodie food food food food food food"
+processed_text = process_text(text)
+X = normalize(np.array(processed_text).reshape(1, -1), axis=1, norm='l1') 
 # Setup the client
-client = FHEModelClient(path_dir=FHE_FILE_PATH_CLIENT, key_dir="/tmp/keys_client")
+client = FHEModelClient(path_dir=FHE_FILE_PATH_CLIENT)
 serialized_evaluation_keys = client.get_serialized_evaluation_keys()
-X_enc = client.quantize_encrypt_serialize(X_test[0].reshape((1, -1)))
+X_enc = client.quantize_encrypt_serialize(X)
 
 
 # Setup the server
@@ -149,4 +152,7 @@ encrypted_result = server.run(X_enc, serialized_evaluation_keys)
 # Client decrypts the result
 y_enc = client.deserialize_decrypt_dequantize(encrypted_result)
 
-print("ENCRYPTED LOSS", np.sum((y_enc - y_test[0]) ** 2) / y_test.shape[0])
+print(y_enc)
+
+
+

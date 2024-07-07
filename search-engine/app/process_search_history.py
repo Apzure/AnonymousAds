@@ -70,18 +70,22 @@ def process_keywords():
 # Converts search history to encrypted normalized vector
 def process_search_history(search_history): 
     try:
-        text = "".join(search_history)
+        text = " ".join(search_history)
         with open(STEMMED_KEYWORDS_FILENAME, 'r') as file:
             stemmed_keywords = json.load(file)
-            
+        
+        logger.info("Stemmed Keywords in processing: %s", stemmed_keywords)
         text = text.replace("-", " ")
         text = REGEX.sub('', text)
         text = text.lower()
         text = text.split()
         text = list(map(STEMMER.stem, text))
         freq = Counter(text)
+
         vector = [freq[category] for category in stemmed_keywords]
         normalized_vector = normalize(np.array(vector).reshape((1, -1)), norm="l1", axis=1)
+        
+        logger.info("normalized vector: %s", normalized_vector)
         encrypted_vector = client.quantize_encrypt_serialize(normalized_vector)
         return encrypted_vector
     except Exception as e:
