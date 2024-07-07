@@ -10,7 +10,6 @@ services:
       - server
     volumes:
       - dev-data:/app/fhe_directory:ro
-      - ./search-engine:/app
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
@@ -22,6 +21,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - dev-data:/app/fhe_directory:ro
+    depends_on:
+      - dev
 
   dev:
     build:
