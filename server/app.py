@@ -3,6 +3,7 @@ import requests
 import logging
 import os
 import base64
+import pickle
 from concrete.ml.deployment import FHEModelServer
 from key import write_key, get_key
 
@@ -24,13 +25,13 @@ except RuntimeError as e:
 @app.route('/recieve_public_key', methods=['POST'])
 def recieve_key():
     logging.info("Received a request to /recieve_public_key")
-    data = request.json
-    if data and 'key' in data:
-        key = data['key']
-        logging.info(f"Received key: {key}")
+    data = request.data
+    try:
+        key = pickle.loads(data)
+        logging.info("Received key")
         write_key(key)
         return jsonify({"status": "success"}), 200
-    else:
+    except pickle.UnpicklingError as e:
         logging.error("Invalid data received")
         return jsonify({"status": "error", "message": "Invalid data"}), 400
 
@@ -38,29 +39,25 @@ def recieve_key():
 def recieve_search_history():
     logging.info("Received a request to /recieve_search_history")
     data = request.json
-    logging.info("0")
     try: 
         serialized_evaluation_keys = get_key()
     except Exception as e:
         logging.error(f"Error reading getting keys file: {str(e)}")
         return jsonify({"error": "Internal server error, no key found"}), 500
-    logging.info("1")
         
     if data and 'search_history' in data:
-        logging.info("11")
         encrypted_input = data['search_history']
         encrypted_input = base64.b64decode(encrypted_input)
         logging.info("Server has received search history: %s", encrypted_input)
         
         try: 
-            logging.info("111")
             encrypted_result = server.run(encrypted_input, serialized_evaluation_keys)
-            logging.info("1111")
+            encoded_bytes = base64.b64encode(encrypted_result).decode('utf-8')
         except Exception as e:
             logging.error(f"Error processing encrypted input {str(e)}")
             return jsonify({"error": "Internal server error"}), 500
 
-        return jsonify({"status": "success", "result": encrypted_result}), 200
+        return jsonify({"status": "success", "result": encoded_bytes}), 200
     else:
         logging.info("2")
         logging.error("Invalid data received")

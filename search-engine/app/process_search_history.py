@@ -25,7 +25,10 @@ FHE_FILE_PATH = "./fhe"
 REGEX = re.compile('[^a-zA-Z ]')
 STEMMER = PorterStemmer()
 client = FHEModelClient(path_dir=FHE_FILE_PATH)
-serialized_evaluation_keys = client.get_serialized_evaluation_keys()
+generate_key = lambda: client.get_serialized_evaluation_keys()
+serialized_evaluation_keys = generate_key()
+
+
 
 def init_keywords():
     get_keywords_if_not_got()
@@ -95,10 +98,15 @@ def send_search_history_to_server(search_history):
 
         response = requests.post(endpoint, json=payload, headers=headers)
         if response.status_code == 200:
-            logger.info(f"Server is active: {SERVER_ADDRESS}")
-        else:
+            raw_bytes = base64.b64decode(response.json()["result"])
+            try: 
+                y = client.deserialize_decrypt_dequantize(raw_bytes)
+            except Exception as e:
+                logger.error(str(e))
+                raise
+            logger.info(str(y))
+            return y
+        else: 
             logger.warning(f"Server returned status code: {response.status_code}")
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to connect to server: {e}")
-    except Exception as e:
-        logger.error(e)

@@ -2,6 +2,8 @@ import os
 import requests
 import json
 import logging
+import pickle
+from app.process_search_history import generate_key
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -14,25 +16,21 @@ KEYWORDS_FILENAME = "./tmp/keywords.txt"
 
 ### Key operations ###
 
-def generate_key():
-    #TODO Replace with Key generation logic
-    return "placeholder_key"
-
 def ensure_key_exists():
     os.makedirs(os.path.dirname(KEY_FILENAME), exist_ok=True)
     if not os.path.exists(KEY_FILENAME) or os.path.getsize(KEY_FILENAME) == 0:
         key = generate_key()
-        with open(KEY_FILENAME, 'w') as file:
-            file.write(key)
+        with open(KEY_FILENAME, 'wb') as file:
+            pickle.dump(key, file)
         logger.info(f"Key file '{KEY_FILENAME}' has been created and written to.")
 
 def read_key():
     try:
-        with open(KEY_FILENAME, 'r') as file:
-            key = file.read().strip()
-            if not key:
+        with open(KEY_FILENAME, 'rb') as file:
+            if key := pickle.load(file):
+                return key
+            else:
                 raise ValueError("Key file is empty")
-            return key
     except FileNotFoundError:
         logger.error(f"Key file '{KEY_FILENAME}' not found")
         raise
@@ -54,9 +52,9 @@ def mark_key_as_sent():
 ### Server Interaction ####
         
 def send_key_to_server(key):
-    endpoint = SERVER_ADDRESS + "/recieve_public_key"
-    headers = {'Content-Type': 'application/json'}
-    payload = json.dumps({'key': key})
+    endpoint = f"{SERVER_ADDRESS}/recieve_public_key"
+    headers = {'Content-Type': 'application/octet-stream'}
+    payload = pickle.dumps(key)
     
     try:
         response = requests.post(endpoint, data=payload, headers=headers)
@@ -80,4 +78,4 @@ def send_key_to_server_if_not_sent():
     else:
         logger.error("Failed to send key to server!")
         raise Exception("Failed to send key to server!")
-        
+    

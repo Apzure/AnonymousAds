@@ -2,6 +2,7 @@ import os
 import requests
 import json
 import logging
+import pickle
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -11,14 +12,13 @@ FHE_PUBLIC_KEY_DIR = "./tmp/key.txt"
 def write_key(key):
     if not key:
         raise ValueError("Key is empty")
+
     try:
-        with open(FHE_PUBLIC_KEY_DIR, 'w+') as file:
-            file.write(key)
-    except FileNotFoundError:
-        logger.error(f"Key file '{FHE_PUBLIC_KEY_DIR}' not found")
-        raise
+        os.makedirs(os.path.dirname(FHE_PUBLIC_KEY_DIR), exist_ok=True)
+        with open(FHE_PUBLIC_KEY_DIR, 'wb+') as file:
+            pickle.dump(key, file)
     except IOError as e:
-        logger.error(f"Error reading key file: {e}")
+        logger.error(f"Error writing key file: {e}")
         raise
     
     logger.info("Key written on server")
@@ -31,8 +31,8 @@ def ensure_key_exists():
 
 def read_key():
     try:
-        with open(FHE_PUBLIC_KEY_DIR, 'r') as file:
-            if key := file.read().strip():
+        with open(FHE_PUBLIC_KEY_DIR, 'rb') as file:
+            if key := pickle.load(file):
                 return key
             
             raise ValueError("Key file is empty")
