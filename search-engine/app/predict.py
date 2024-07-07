@@ -48,7 +48,7 @@ def get_new_prediction(curr_pred):
     
     num_req_made += 1
     logger.info(f"Total predictions: {num_req_made}")
-    if old_pred_exists(curr_pred):
+    if old_pred_exists(curr_pred) and num_req_made != 1:
         old_pred = read_pred()
         weight = 1 / (num_req_made + 1)
         for key in old_pred:

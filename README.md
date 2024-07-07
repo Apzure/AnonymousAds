@@ -116,6 +116,8 @@ We recommend having at least 6GB of Disk Space and 2GB of RAM.
 
 <!-- INSERT SCREENSHOT OF LANDING PAGE HERE -->
 
+![alt text](docs/image.png)
+
 2. Initially, there would be no ads displayed on the page. 
 
 <!-- INSERT SCREENSHOT OF QUERY PAGE HERE + NO ADS-->
