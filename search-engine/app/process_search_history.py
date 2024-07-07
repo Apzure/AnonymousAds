@@ -102,14 +102,27 @@ def send_search_history_to_server(search_history):
 
         response = requests.post(endpoint, json=payload, headers=headers)
         if response.status_code == 200:
-            raw_bytes = base64.b64decode(response.json()["result"])
+            raw_bytes = base64.b64decode(response.json()["prediction"])
+            categories = response.json()["categories"]
+            
+            # Decrypt vector
             try: 
-                y = client.deserialize_decrypt_dequantize(raw_bytes)
+                vector = client.deserialize_decrypt_dequantize(raw_bytes)
+                vector = vector[0].tolist()
             except Exception as e:
                 logger.error(str(e))
                 raise
-            logger.info(str(y))
-            return y
+            
+            # Combine categories and their respective predictions
+            predictions = [(x,y) for x, y in sorted(zip(categories, vector), key=lambda pair: pair[1], reverse=True)]
+            
+            # Log predictions
+            logger.info("Predictions recieved:")
+            for x, y in predictions:
+                x = x.title()
+                logger.info(f"{x} has probability: {y}")
+                
+            return predictions
         else: 
             logger.warning(f"Server returned status code: {response.status_code}")
     except requests.exceptions.RequestException as e:
