@@ -22,7 +22,6 @@ def send_search_history():
     init_keywords()
     send_key_to_server_if_not_sent()
     search_history_vector = process_search_history(search_history) 
-    logging.info("Successfully processed search history")
     prediction = send_search_history_to_server(search_history_vector)
     logging.info("Successfully predicted")
     return jsonify(prediction), 200

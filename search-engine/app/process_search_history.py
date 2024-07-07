@@ -38,7 +38,8 @@ def is_keywords_got():
     
 def get_keywords_if_not_got():
     if is_keywords_got():
-        logger.info("Keywords have already been got. Skipping.")
+        logger.info("Keywords have already been retrieved. Skipping.")
+        logger.info("-" * 30)  
         return
 
     endpoint = f"{SERVER_ADDRESS}/get_keywords"
@@ -52,78 +53,112 @@ def get_keywords_if_not_got():
             with open(KEYWORDS_FILENAME, 'w') as file:
                 json.dump(keywords, file)
             logger.info(f"Keywords file '{KEYWORDS_FILENAME}' has been created and written to.")
+            logger.info("-" * 30)  
         else:
             logger.warning(f"Server returned status code: {response.status_code}")
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to connect to server: {e}")
         
 def process_keywords():
+    logger.info("Starting to process keywords into stemmed_keywords")
     with open(KEYWORDS_FILENAME, 'r') as file:
         keywords = json.load(file)
     stemmed_keywords = list(map(STEMMER.stem, keywords))
-    logger.info("stemmed_keywords: %s", stemmed_keywords)
+    logger.info("Stemmed_keywords have been processed: %s", stemmed_keywords)
     with open(STEMMED_KEYWORDS_FILENAME, 'w') as file:
         json.dump(stemmed_keywords, file)
     logger.info(f"Stemmed Keywords file '{STEMMED_KEYWORDS_FILENAME}' has been created and written to.")    
+    logger.info("Succesfully processed keywords into stemmed_keywords")
+    logger.info("-" * 30)  
 
 # Converts search history to encrypted normalized vector
 def process_search_history(search_history): 
     try:
+        logger.info("-" * 30)  
+        logger.info("Starting to process search history with %d entries", len(search_history))
         text = " ".join(search_history)
+        
         with open(STEMMED_KEYWORDS_FILENAME, 'r') as file:
             stemmed_keywords = json.load(file)
+        logger.info("Retrieved %d stemmed keywords from file", len(stemmed_keywords))
         
-        logger.info("Stemmed Keywords in processing: %s", stemmed_keywords)
+        logger.debug("Preprocessing text: removing hyphens, applying regex, and converting to lowercase")
         text = text.replace("-", " ")
         text = REGEX.sub('', text)
         text = text.lower()
+        
+        logger.debug("Tokenizing and stemming text")
         text = text.split()
         text = list(map(STEMMER.stem, text))
-        freq = Counter(text)
-
-        vector = [freq[category] for category in stemmed_keywords]
-        normalized_vector = normalize(np.array(vector).reshape((1, -1)), norm="l1", axis=1)
         
-        logger.info("normalized vector: %s", normalized_vector)
+        logger.debug("Calculating word frequencies")
+        freq = Counter(text)
+        
+        logger.debug("Creating vector based on stemmed keywords")
+        vector = [freq[category] for category in stemmed_keywords]
+        
+        logger.info("Normalizing vector")
+        normalized_vector = normalize(np.array(vector).reshape((1, -1)), norm="l1", axis=1)
+        logger.debug("Normalized vector shape: %s", normalized_vector.shape)
+        
+        logger.info("Encrypting normalized vector")
         encrypted_vector = client.quantize_encrypt_serialize(normalized_vector)
+        logger.info("Encryption complete. Encrypted vector size: %d bytes", len(encrypted_vector))
+        
+        logging.info("Successfully processed search history")
+        logger.info("-" * 30)  
         return encrypted_vector
     except Exception as e:
-        logger.error(e)
+        logger.error("Error in process_search_history: %s", str(e), exc_info=True)
         raise
 
 def send_search_history_to_server(search_history):
+    logger.info("Starting process to send encrypted search history to server")
     try:
         endpoint = f"{SERVER_ADDRESS}/recieve_search_history"
         headers = {'Content-Type': 'application/json'}
 
         search_history_str = base64.b64encode(search_history).decode('utf-8')
         payload = {"search_history": search_history_str}
+        logger.debug(f"Payload size: {len(search_history_str)} bytes")
 
+        logger.info(f"Sending POST request to {endpoint}")
         response = requests.post(endpoint, json=payload, headers=headers)
+        
         if response.status_code == 200:
+            logger.info("Received 200 OK response from server")
             raw_bytes = base64.b64decode(response.json()["prediction"])
             categories = response.json()["categories"]
+            logger.debug(f"Received {len(categories)} categories from server")
 
             # Decrypt vector
+            logger.info("Starting decryption of received vector")
             try: 
                 vector = client.deserialize_decrypt_dequantize(raw_bytes)
                 vector = vector[0].tolist()
+                logger.debug(f"Decrypted vector length: {len(vector)}")
             except Exception as e:
-                logger.error(str(e))
+                logger.error(f"Error during decryption: {str(e)}", exc_info=True)
                 raise
 
             predictions = dict(zip(categories, vector))
+            logger.debug("Created predictions dictionary")
             predictions = clean_normalize_predictions(predictions)
+            logger.info("Cleaned and normalized predictions")
+
             # Log predictions
-            logger.info("Predictions received:")
+            logger.info("Predictions received and decrypted from server:")
             display_predictions(predictions)
 
             new_predictions = get_new_prediction(predictions)
-            logger.info("New predictions received:")
+            logger.info("Updated predictions:")
             display_predictions(new_predictions)
 
             return predictions
         else: 
-            logger.warning(f"Server returned status code: {response.status_code}")
+            logger.warning(f"Server returned unexpected status code: {response.status_code}")
+            logger.debug(f"Response content: {response.text}")
     except requests.exceptions.RequestException as e:
-        logger.error(f"Failed to connect to server: {e}")
+        logger.error(f"Failed to connect to server: {str(e)}", exc_info=True)
+    except Exception as e:
+        logger.error(f"Unexpected error in send_search_history_to_server: {str(e)}", exc_info=True)
