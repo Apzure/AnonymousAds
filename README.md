@@ -39,14 +39,20 @@
 AnonymousAds is a web application that serves targeted advertising to users, without compromising user privacy. It uses fully homomorphic encryption (FHE) and noise injection to allow for these ads to be served. For more information, you can watch our team's video. This project
 is a submission to TikTok TechJam 2024. 
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
 
-- Flask
 - ConcreteML
+- Flask
+- NTLK
+- Sklearn
+- Torch
+- Pandas
+- numpy
+- requests
+- shutil
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 <!-- METHODOLOGY -->
 
@@ -105,8 +111,6 @@ We recommend having at least 6GB of Disk Space and 2GB of RAM.
    ```
 4. Open up the link [http://127.0.0.1:5000](http://127.0.0.1:5000) provided in the terminal
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 <!-- USAGE EXAMPLES -->
 
 ## Usage
@@ -140,13 +144,14 @@ We recommend having at least 6GB of Disk Space and 2GB of RAM.
 
 <!-- INSERT IMG OF DOCKER-->!
 
-[alt text](docs/images/docker_logs.png)
+![alt text](docs/images/docker_logs.png)
 
 ### Queries and Keywords 
 
-As you input more queries, the search-engine would keep track of and update your preferences, using a Bayesian update scheme. This means that initially, the search-engine would update its predictions by a greater magnitude as more information is inputted. Over time, as more queries are entered, the model would stabilize into a set of predictions, and the ads displayed would not change as much. 
+As you input more queries, our search engine tracks and updates your preferences using a Bayesian update scheme. Initially, the engine makes larger adjustments to its predictions as it gathers more information. Over time, as more queries are entered, the model stabilizes, and the ads displayed become more consistent.
 
-Include these keywords in your search queries for them to be categorized by the ML model. Your queries can include punctuations and words other than the keywords. The keywords themselves are not case-sensitive and you can include different words with the same "stem" as the keyword for them to be counted too. See [nltk documentation](https://www.nltk.org/howto/stem.html#unit-tests-for-the-porter-stemmer) for more about stemming.
+#### Keyword Usage
+To help our machine learning model categorize your queries effectively, please include the following keywords. Your queries can contain punctuation and additional words besides the keywords. The keywords are not case-sensitive, and you can use different words with the same "stem" as the keyword. For more about stemming, see the [nltk documentation](https://www.nltk.org/howto/stem.html#unit-tests-for-the-porter-stemmer) for more about stemming.
 
 Example: "games" shares the same stem "gam" as "gaming" which is a keyword, so "games" would be picked up by the model. 
 
@@ -182,10 +187,8 @@ As described in the methodology above, the `server.zip` and `client.zip` files a
 6. Replace the respective zip files in `search-engine/fhe` and `server/fhe`. 
 7. Run `docker compose up` again, and the model is now the newly trained model!
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Acknowledgments
 
 We used royalty-free stock photos in our application. For more information, see [`docs/credits.txt`](docs/credit.txt) in our repo.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
