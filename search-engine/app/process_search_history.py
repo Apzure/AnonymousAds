@@ -29,7 +29,6 @@ generate_key = lambda: client.get_serialized_evaluation_keys()
 serialized_evaluation_keys = generate_key()
 
 
-
 def init_keywords():
     get_keywords_if_not_got()
     process_keywords()
@@ -41,14 +40,14 @@ def get_keywords_if_not_got():
     if is_keywords_got():
         logger.info("Keywords have already been got. Skipping.")
         return
-    
-    endpoint = SERVER_ADDRESS + "/get_keywords"
+
+    endpoint = f"{SERVER_ADDRESS}/get_keywords"
     try:
         response = requests.get(endpoint)
         if response.status_code == 200:
             keywords = response.json().get("keywords")
             logger.info("Received keywords from server: %s", keywords)
-            
+
             os.makedirs(os.path.dirname(KEYWORDS_FILENAME), exist_ok=True)
             with open(KEYWORDS_FILENAME, 'w') as file:
                 json.dump(keywords, file)
@@ -94,9 +93,9 @@ def process_search_history(search_history):
 
 def send_search_history_to_server(search_history):
     try:
-        endpoint = SERVER_ADDRESS + "/recieve_search_history"
+        endpoint = f"{SERVER_ADDRESS}/recieve_search_history"
         headers = {'Content-Type': 'application/json'}
-        
+
         search_history_str = base64.b64encode(search_history).decode('utf-8')
         payload = {"search_history": search_history_str}
 
@@ -104,7 +103,7 @@ def send_search_history_to_server(search_history):
         if response.status_code == 200:
             raw_bytes = base64.b64decode(response.json()["prediction"])
             categories = response.json()["categories"]
-            
+
             # Decrypt vector
             try: 
                 vector = client.deserialize_decrypt_dequantize(raw_bytes)
@@ -112,20 +111,17 @@ def send_search_history_to_server(search_history):
             except Exception as e:
                 logger.error(str(e))
                 raise
-            
+
             predictions = dict(zip(categories, vector))
             predictions = clean_normalize_predictions(predictions)
-            
             # Log predictions
             logger.info("Predictions received:")
             display_predictions(predictions)
-        
+
             new_predictions = get_new_prediction(predictions)
             logger.info("New predictions received:")
             display_predictions(new_predictions)
-            
-            
-            
+
             return predictions
         else: 
             logger.warning(f"Server returned status code: {response.status_code}")

@@ -8,6 +8,7 @@ import pickle
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 PREDICT_FILENAME = "./tmp/predict.txt"
+num_req_made = 0
 
 ### Prediction operations ###
 
@@ -42,11 +43,16 @@ def write_prediction(new_prediction):
         raise
     
 def get_new_prediction(curr_pred):
+    global num_req_made
+    
+    num_req_made += 1
     if old_pred_exists(curr_pred):
         old_pred = read_pred()
+        weight = 1 / (num_req_made + 1)
         for key in old_pred:
-            curr_pred[key] += old_pred[key]
-            curr_pred[key] /= 2
+            curr_pred[key] += (1 - weight) * old_pred[key] + weight * curr_pred[key]
+
+    curr_pred = clean_normalize_predictions(curr_pred)
     write_prediction(curr_pred)
     return curr_pred
 
@@ -65,6 +71,6 @@ def sort_predictions(predictions):
     return list(sorted(predictions.items(), key=lambda pair: pair[1], reverse=True))
     
 def display_predictions(predictions):
-    sort_predictions(predictions)
-    for x, y in predictions:
+    sorted_pred = sort_predictions(predictions)
+    for x, y in sorted_pred:
         logger.info(f"{x.title()} has probability: {y}")

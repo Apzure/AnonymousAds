@@ -48,7 +48,7 @@ def recieve_search_history():
     if data and 'search_history' in data:
         encrypted_input = data['search_history']
         encrypted_input = base64.b64decode(encrypted_input)
-        logging.info("Server has received search history: %s", encrypted_input)
+        logging.info("Server has received search history")
         
         try: 
             encrypted_result = server.run(encrypted_input, serialized_evaluation_keys)
