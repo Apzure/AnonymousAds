@@ -67,7 +67,7 @@ def send_key_to_server(key):
     
 def send_key_to_server_if_not_sent():
     if is_key_sent():
-        logger.info("Key has already been sent. Skipping.")
+        logger.info("Key has already been sent to server. Skipping.")
         return
     
     key = get_key()

@@ -101,6 +101,10 @@ def get_keywords():
         logging.error(f"Error reading keywords file: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
+@app.route('/image/<filename>', methods=['GET'])
+def send_image(filename):
+    return send_from_directory('data/ad-images', filename)
+
 
 if __name__ == '__main__':
     app.run(port=5001, debug=True, host='0.0.0.0')

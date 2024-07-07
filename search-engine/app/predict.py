@@ -43,6 +43,7 @@ def write_prediction(new_prediction):
         raise
     
 def get_new_prediction(curr_pred):
+    logger.info("Starting process to update existing predictions using bayesian inference")
     global num_req_made
     
     num_req_made += 1
@@ -55,6 +56,8 @@ def get_new_prediction(curr_pred):
 
     curr_pred = clean_normalize_predictions(curr_pred)
     write_prediction(curr_pred)
+    
+    logger.info("Successfully updated existing predictions using bayesian inference")
     return curr_pred
 
 def clean_normalize_predictions(predictions):
@@ -78,7 +81,6 @@ def sort_predictions(predictions):
     
 def display_predictions(predictions):
     predictions = sort_predictions(predictions)
-    logger.info("-" * 30) 
     for i, (category, probability) in enumerate(predictions, 1):
         category = category.title()
         logger.info(f"{i}. {category:<10} Probability: {probability:.4f}")

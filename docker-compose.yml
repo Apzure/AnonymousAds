@@ -9,7 +9,7 @@ services:
     depends_on:
       - server
     # volumes:
-      # - ./search-engine:/app
+    #   - ./search-engine:/app
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
@@ -19,6 +19,8 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
     depends_on:
       - dev
 
