@@ -147,13 +147,17 @@
           if (child.tagName === 'IMG') {
             adsContainer.removeChild(child);
           }
-        })
+        });
+
         const ad_1 = document.createElement('img');
         ad_1.src = data[0];
-        const ad_2 = document.createElement('img');
-        ad_2.src = data[1];
         adsContainer.appendChild(ad_1);
-        adsContainer.insertBefore(ad_2, adsContainer.firstChild);
+
+        if (data.length > 1) {
+          const ad_2 = document.createElement('img');
+          ad_2.src = data[1];
+          adsContainer.insertBefore(ad_2, adsContainer.firstChild);
+        }
       })
       .catch((error) => {
         console.error("Error:", error);

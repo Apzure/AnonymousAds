@@ -29,27 +29,44 @@ def send_search_history():
 
 @app.route('/get_ads', methods = ['POST'])
 def send_ads():
-    good_ads = []
+    logging.info("-" * 30)
+    logging.info("Starting send_ads process")
+    
     data = request.json.get('prediction')
-    best_ad = max(data, key=data.get)
+    if not data:
+        logging.error("No prediction data received")
+        return jsonify({"error": "No prediction data"}), 400
+    
+    sorted_ads = sorted(data.items(), key=lambda item: item[1], reverse=True)
+    best_ad, best_prob = sorted_ads[0]
     ads = [best_ad]
-    remaining_ads = [ad for ad in data if ad not in ads]
-    next_best_ad = max(remaining_ads, key=lambda ad: data[ad] if data[ad] != data[best_ad] else float('-inf'))
-    ads.append(next_best_ad)
+    
+    # Determine if the second-best ad should be included based on the probability difference
+    if len(sorted_ads) > 1 and best_prob - sorted_ads[1][1] < 0.1:  # Threshold for showing the second ad
+        ads.append(sorted_ads[1][0])
+    
     good_ads = list(ads)
     logging.info("Successfully selected best ads")
-    remaining_ads = [ad for ad in remaining_ads if ad not in ads]
-    noisy_ad_1 = random.choice(remaining_ads)
-    ads.append(noisy_ad_1)
-    remaining_ads = [ad for ad in remaining_ads if ad not in ads]
-    noisy_ad_2 = random.choice(remaining_ads)
-    ads.append(noisy_ad_2)
+    
+    remaining_ads = [ad for ad, _ in sorted_ads if ad not in ads]
+    if remaining_ads:
+        noisy_ad_1 = random.choice(remaining_ads)
+        ads.append(noisy_ad_1)
+        remaining_ads = [ad for ad in remaining_ads if ad != noisy_ad_1]
+    if remaining_ads:
+        noisy_ad_2 = random.choice(remaining_ads)
+        ads.append(noisy_ad_2)
+    
     logging.info("Successfully added noisy ads")
+    
     imageURLs = [f"http://server:5001/image/{cat}_1.jpg" for cat in ads]
     for url in imageURLs:
         try:
             requests.get(url)
         except requests.exceptions.RequestException as e:
             logging.error("Error getting image: %s", e)
-    goodImageURLS = [f"http://localhost:5001/image/{cat}_1.jpg" for cat in good_ads]
-    return jsonify(goodImageURLS), 200
+    
+    goodImageURLs = [f"http://localhost:5001/image/{cat}_1.jpg" for cat in good_ads]
+    logging.info("Completed send_ads process")
+    logging.info("-" * 30)
+    return jsonify(goodImageURLs), 200
