@@ -133,38 +133,32 @@
     }
 
     function displayAds(data) {
-      const adsContainer = document.getElementById('inner-search');
-      Array.from(adsContainer.children).forEach(child => {
-        if (child.tagName === 'IMG') {
-          adsContainer.removeChild(child);
-        }
+      fetch("/get_ads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prediction: data }),
       })
-      let ads = [];
-      let good_ads = [];
-      ads.push(Object.keys(data).reduce((a, b) => data[a] > data[b] ? a : b)); // Best ad
-      let remainingAds = Object.keys(data).filter(ad => !ads.includes(ad));
-      ads.push(remainingAds.reduce((a, b) => data[a] > data[b] && data[a] !== ads[0] ? a : b)); // Next Best ad
-      good_ads = ads.slice();
-      remainingAds = remainingAds.filter(ad => !ads.includes(ad));
-      ads.push(remainingAds[Math.floor(Math.random() * remainingAds.length)]); // Noisy ad 1
-      remainingAds = remainingAds.filter(ad => !ads.includes(ad));
-      ads.push(remainingAds[Math.floor(Math.random() * remainingAds.length)]); // Noisy ad 2
-      
-      let before = true;
-      ads.forEach(imageUrl => {
-        const img = document.createElement('img');
-        img.src = "http://localhost:5001/image/" + imageUrl + "_1.jpg";
-        if (good_ads.includes(imageUrl)) {
-          if (before) {
-            adsContainer.appendChild(img);
-            before = false;
-          } else {
-            adsContainer.insertBefore(img, adsContainer.firstChild);
+      .then((response) => response.json())
+      .then((data) => {
+        const adsContainer = document.getElementById('inner-search');
+        Array.from(adsContainer.children).forEach(child => {
+          if (child.tagName === 'IMG') {
+            adsContainer.removeChild(child);
           }
-        } 
+        })
+        const ad_1 = document.createElement('img');
+        ad_1.src = data[0];
+        const ad_2 = document.createElement('img');
+        ad_2.src = data[1];
+        adsContainer.appendChild(ad_1);
+        adsContainer.insertBefore(ad_2, adsContainer.firstChild);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
     }
-
     displaySearchHistory();
   });
 </script>
