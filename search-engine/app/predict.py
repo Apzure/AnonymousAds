@@ -78,7 +78,6 @@ def sort_predictions(predictions):
     
 def display_predictions(predictions):
     predictions = sort_predictions(predictions)
-    logger.info("Predictions recieved:")
     logger.info("-" * 30) 
     for i, (category, probability) in enumerate(predictions, 1):
         category = category.title()
