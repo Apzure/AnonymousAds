@@ -94,6 +94,12 @@
         const query = input.value;
         handleSearch(query);
       });
+
+      // Load ads from local storage on page load
+      const storedAds = JSON.parse(localStorage.getItem("ads")) || [];
+      if (storedAds.length > 0) {
+        displayAds(storedAds, true);
+      }
     });
 
     const clearAllButton = document.getElementById("clear-all-history");
@@ -132,37 +138,51 @@
       displaySearchHistory();
     }
 
-    function displayAds(data) {
-      fetch("/get_ads", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prediction: data }),
-      })
-      .then((response) => response.json())
-      .then((data) => {
-        const adsContainer = document.getElementById('inner-search');
-        Array.from(adsContainer.children).forEach(child => {
-          if (child.tagName === 'IMG') {
-            adsContainer.removeChild(child);
-          }
+    function displayAds(data, fromStorage = false) {
+      if (!fromStorage) {
+        fetch("/get_ads", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prediction: data }),
+        })
+        .then((response) => response.json())
+        .then((ads) => {
+          saveAdsToLocal(ads);
+          renderAds(ads);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
         });
-
-        const ad_1 = document.createElement('img');
-        ad_1.src = data[0];
-        adsContainer.appendChild(ad_1);
-
-        if (data.length > 1) {
-          const ad_2 = document.createElement('img');
-          ad_2.src = data[1];
-          adsContainer.insertBefore(ad_2, adsContainer.firstChild);
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+      } else {
+        renderAds(data);
+      }
     }
+
+    function saveAdsToLocal(ads) {
+      localStorage.setItem("ads", JSON.stringify(ads));
+    }
+
+    function renderAds(ads) {
+      const adsContainer = document.getElementById('inner-search');
+      Array.from(adsContainer.children).forEach(child => {
+        if (child.tagName === 'IMG') {
+          adsContainer.removeChild(child);
+        }
+      });
+
+      const ad_1 = document.createElement('img');
+      ad_1.src = ads[0];
+      adsContainer.appendChild(ad_1);
+
+      if (ads.length > 1) {
+        const ad_2 = document.createElement('img');
+        ad_2.src = ads[1];
+        adsContainer.insertBefore(ad_2, adsContainer.firstChild);
+      }
+    }
+
     displaySearchHistory();
   });
 </script>
