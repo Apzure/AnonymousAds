@@ -50,8 +50,6 @@ def process_text(text):
 
 
 def non_linear_fn(x):
-    # TO DO!
-    # current model for testing
     global KEYWORDS_PER_CATEGORY
     reshaped = x[:len(x) - len(x) % KEYWORDS_PER_CATEGORY].reshape(-1, KEYWORDS_PER_CATEGORY)
     return np.sum(reshaped, axis=1)
@@ -86,15 +84,14 @@ def clear_fhe_dir():
 n_inputs = len(KEYWORDS)
 n_outputs = NUM_CATEGORIES
 params = {
-    "module__n_layers": 3,
+    "module__n_layers": 5,
     "module__activation_function" : nn.ReLU,
     "module__n_hidden_neurons_multiplier" : 4,
     
-    "module__n_w_bits" : 3, 
-    "module__n_a_bits" : 3,
-    "module__n_accum_bits" : 64,
+    "module__n_w_bits" : 4, 
+    "module__n_a_bits" : 4,
     
-    "max_epochs": 10,
+    "max_epochs": 100,
     "verbose" : True,
     "lr" : 1e-3,
 }
@@ -132,8 +129,8 @@ print(np.sum((y_pred - y_test) ** 2) / y_pred.shape[0])
 concrete_regressor.compile(X_train)
 dev = FHEModelDev(path_dir=FHE_FILE_PATH, model=concrete_regressor)
 
-# clear_fhe_dir()
-# dev.save()
+clear_fhe_dir()
+dev.save()
 
 
 # Setup the client
