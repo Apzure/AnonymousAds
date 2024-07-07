@@ -112,27 +112,35 @@ We recommend having at least 6GB of Disk Space and 2GB of RAM.
 ## Usage
 
 ### Basic Usage
-1. When the opening the link above, you will be greeted by this landing page. Enter your queries into the search bar and hit ENTER or click the search button on the right
+1. When the opening the link above, you will be greeted by this landing page. Enter your queries into the search bar and hit ENTER or click the search button on the right.
 
 <!-- INSERT SCREENSHOT OF LANDING PAGE HERE -->
 
-![alt text](docs/image.png)
+![alt text](docs/images/landing_page.png)
 
 2. Initially, there would be no ads displayed on the page. 
 
 <!-- INSERT SCREENSHOT OF QUERY PAGE HERE + NO ADS-->
 
+![alt text](docs/images/query_page_no_ads.png)
+
 3. Every 5 queries, the page would be automatically updated with new ads based on your search results. It would take 5-10 seconds for the ads to be updated. See [Queries and Keywords](#queries-and-keywords) for more information.
 
 <!-- INSERT SCREENSHOT OF QUERY PAGE HERE + ADS-->
+
+![alt text](docs/images/query_page_with_ads.png)
 
 4. You can view your past queries by clicking on the HISTORY icon 
 
 <!-- INSERT SCREENSHOT OF QUERY PAGE HERE + ADS + HISTORY-->
 
+![alt text](docs/images/query_page_history.png)
+
 5. You view the logs on Docker Desktop for more information. 
 
-<!-- INSERT GIF OF DOCKER-->
+<!-- INSERT IMG OF DOCKER-->!
+
+[alt text](docs/images/docker_logs.png)
 
 ### Queries and Keywords 
 
