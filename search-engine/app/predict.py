@@ -3,7 +3,7 @@ import requests
 import json
 import logging
 import pickle
-
+import random
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -63,6 +63,11 @@ def clean_normalize_predictions(predictions):
             predictions[category] = 0
         sum_pred += predictions[category]
     
+    if sum_pred <= 0:
+        rand_category = random.choice(list(predictions.keys()))
+        predictions[rand_category] = 1
+        sum_pred = 1
+
     for category in predictions:
         predictions[category] /= sum_pred
     return predictions
