@@ -23,33 +23,6 @@ FHE_FILE_PATH = "./fhe"
 REGEX = re.compile('[^a-zA-Z ]')
 STEMMER = PorterStemmer()
 client = FHEModelClient(path_dir=FHE_FILE_PATH)
-
-def clear_directory(directory_path):
-    try:
-        # Ensure the directory exists
-        if not os.path.exists(directory_path):
-            raise FileNotFoundError(f"Directory '{directory_path}' not found")
-        
-        # Iterate over all the files in the directory
-        for filename in os.listdir(directory_path):
-            file_path = os.path.join(directory_path, filename)
-            logger.info("%s", file_path)
-            try:
-                # Check if it is a file (not a directory) and remove it
-                if os.path.isfile(file_path) or os.path.islink(file_path):
-                    os.unlink(file_path)
-                    
-                # If it's a directory, you can decide whether to delete it
-                elif os.path.isdir(file_path):
-                    shutil.rmtree(file_path)
-            except Exception as e:
-                print(f"Failed to delete {file_path}. Reason: {e}")
-        logger.info(f"Directory '{directory_path}' has been cleared.")
-    except Exception as e:
-        print(f"Error clearing directory: {e}")
-
-
-
 generate_key = lambda: client.get_serialized_evaluation_keys()
 serialized_evaluation_keys = generate_key()
 

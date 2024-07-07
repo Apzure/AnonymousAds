@@ -40,23 +40,16 @@ def send_ads():
     logging.info(f"Received prediction data with {len(data)} categories")
     
     sorted_ads = sorted(data.items(), key=lambda item: item[1], reverse=True)
-    best_ad, best_prob = sorted_ads[0]
-    ads = [best_ad]
-    logging.info(f"Best ad selected: {best_ad} with probability {best_prob:.4f}")
     
-    # Determine if the second-best ad should be included based on the probability difference
-    if len(sorted_ads) > 1:
-        second_best_ad, second_best_prob = sorted_ads[1]
-        if second_best_prob >= 0.2:  # Threshold for showing the second ad
-            ads.append(second_best_ad)
-            logging.info(f"Second-best ad included: {second_best_ad} with probability {second_best_prob:.4f}")
-        else:
-            logging.info(f"Second-best ad not included.")
+    # Always select the top two ads
+    ads = [ad for ad, _ in sorted_ads[:2]]
+    logging.info(f"Top two ads selected: {ads[0]} and {ads[1]}")
     
     good_ads = list(ads)
     logging.info(f"Successfully selected {len(good_ads)} best ad(s)")
     
-    remaining_ads = [ad for ad, _ in sorted_ads if ad not in ads]
+    # If there are more than two categories, add noisy ads
+    remaining_ads = [ad for ad, _ in sorted_ads[2:]]
     for _ in range(2):
         if remaining_ads:
             noisy_ad = random.choice(remaining_ads)

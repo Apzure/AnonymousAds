@@ -170,7 +170,6 @@ gaming, consoles, accessories, esports, multiplayer, virtual, pc, development, m
 #### TV 
 tv, dramas, shows, smart, reviews, theater, cable, series, reality, channels, binge, sports, food, music, gaming, tv
 
-
 ### Training the model
 
 As described in the methodology above, the `server.zip` and `client.zip` files are used to generate the public keys and stores the model for the server. If you would like to train the model yourself and generate these files, you can follow these steps:
@@ -187,6 +186,21 @@ As described in the methodology above, the `server.zip` and `client.zip` files a
 6. Replace the respective zip files in `search-engine/fhe` and `server/fhe`
 7. Run `docker compose up` again, and the model is now the newly trained model!
 
+## Ad Selection and Image Availability (Proof of Concept)
+
+Current system limitations:
+- Selects top 2 ads based on prediction probabilities
+- 1 image per category for demonstration
+- Second ad may be less relevant if searches focus on one subject
+
+Example: Frequent "sports" searches may result in "sports" and an unrelated category as top ads.
+
+Potential future enhancements:
+1. Multiple images per category
+2. Improved ad selection algorithm
+3. Dynamic image database updates
+
+Note: These limitations are expected in a proof of concept and would be addressed in a full implementation.
 
 ## Acknowledgments
 

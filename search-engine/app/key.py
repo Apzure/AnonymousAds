@@ -25,3 +25,4 @@ def send_key_to_server():
         logger.info("Key generated and sent successfully to server")
     except requests.exceptions.RequestException as e:
         logger.error(f"Error sending key to server: {e}")
+                                                                            
