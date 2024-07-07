@@ -53,13 +53,28 @@ def recieve_search_history():
         try: 
             encrypted_result = server.run(encrypted_input, serialized_evaluation_keys)
             encoded_bytes = base64.b64encode(encrypted_result).decode('utf-8')
+            
+            # Get categories
+            CATEGORIES_FILE = "./categories.txt"
+            
+            try:
+                # Check if the file exists
+                if not os.path.exists(CATEGORIES_FILE):
+                    logging.error(f"Categories file '{CATEGORIES_FILE}' not found")
+                    return jsonify({"Error": "Categories file not found on server side"}), 500
+                
+                with open(CATEGORIES_FILE, 'r') as file:
+                    categories = [line.strip() for line in file if line.strip()]
+            except Exception as e:
+                logging.error(f"Error reading keywords file: {str(e)}")
+                return jsonify({"error": "Internal server error"}), 500
+
+            return jsonify({"status": "success", "prediction": encoded_bytes, "categories": categories}), 200
+    
         except Exception as e:
             logging.error(f"Error processing encrypted input {str(e)}")
             return jsonify({"error": "Internal server error"}), 500
-
-        return jsonify({"status": "success", "result": encoded_bytes}), 200
     else:
-        logging.info("2")
         logging.error("Invalid data received")
         return jsonify({"status": "error", "message": "Invalid data"}), 400
 
@@ -72,7 +87,7 @@ def get_keywords():
         # Check if the file exists
         if not os.path.exists(KEYWORDS_FILE):
             logging.error(f"Keywords file '{KEYWORDS_FILE}' not found")
-            return jsonify({"error": "Keywords file not found"}), 404
+            return jsonify({"Error": "Keywords file not found on server side"}), 500
 
         # Read keywords from the file
         with open(KEYWORDS_FILE, 'r') as file:
