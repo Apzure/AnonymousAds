@@ -13,11 +13,11 @@
   </div>
   <div class="search-container">
     <h1><a href="#">Priv</a></h1>
+    <div id="ads" class="ads-container"></div>
     <div class="google-search">
       <div class="gcse-search"></div>
     </div>
   </div>
-  <div id="ads" class="ads-container"></div>
 </div>
 {% endblock %} 
 
@@ -142,10 +142,9 @@
       
       ads.forEach(imageUrl => {
         const img = document.createElement('img');
-        img.src = "../ad-images" + imageUrl + "_1.jpg";
+        img.src = "http://localhost:5000/image/" + imageUrl + "_1.jpg";
         adsContainer.appendChild(img);
       });
-      // TODO: styling for the images
     }
 
     displaySearchHistory();
