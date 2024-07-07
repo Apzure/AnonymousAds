@@ -8,8 +8,8 @@ services:
       - "5000:5000"
     depends_on:
       - server
-    volumes:
-      - ./search-engine:/app
+    # volumes:
+    #   - ./search-engine:/app
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
