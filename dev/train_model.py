@@ -135,7 +135,8 @@ dev.save()
 
 text = "Food foodie food food food food food food"
 processed_text = process_text(text)
-X = normalize(np.array(processed_text).reshape(1, -1), axis=1, norm='l1') 
+X = normalize(np.array(processed_text).reshape(1, -1), axis=1, norm='l1')
+print(X)
 # Setup the client
 client = FHEModelClient(path_dir=FHE_FILE_PATH_CLIENT)
 serialized_evaluation_keys = client.get_serialized_evaluation_keys()
