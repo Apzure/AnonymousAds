@@ -186,21 +186,9 @@ As described in the methodology above, the `server.zip` and `client.zip` files a
 6. Replace the respective zip files in `search-engine/fhe` and `server/fhe`
 7. Run `docker compose up` again, and the model is now the newly trained model!
 
-## Ad Selection and Image Availability (Proof of Concept)
+## Ad Selection 
 
-Current system limitations:
-- Selects top 2 ads based on prediction probabilities
-- 1 image per category for demonstration
-- Second ad may be less relevant if searches focus on one subject
-
-Example: Frequent "sports" searches may result in "sports" and an unrelated category as top ads.
-
-Potential future enhancements:
-1. Multiple images per category
-2. Improved ad selection algorithm
-3. Dynamic image database updates
-
-Note: These limitations are expected in a proof of concept and would be addressed in a full implementation.
+Note that we have chosen to display top 2 ads from 2 different categories. This means that if the user has searches that only focuses on one category e.g. sports, which normally only occurs with low quantites of searches, one of the ads may be relatively untargeted.
 
 ## Acknowledgments
 
