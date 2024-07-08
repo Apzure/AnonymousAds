@@ -134,7 +134,7 @@ We recommend having at least 6GB of Disk Space and 2GB of RAM.
 
 ![alt text](docs/images/query_page_with_ads.png)
 
-4. You can view your past queries by clicking on the HISTORY icon.
+4. You can view your past queries by clicking on the HISTORY icon. Click on the same icon to hide your history.
 
 <!-- INSERT SCREENSHOT OF QUERY PAGE HERE + ADS + HISTORY-->
 
