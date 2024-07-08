@@ -37,7 +37,7 @@
 ## About The Project
 
 AnonymousAds is a web application that serves targeted advertising to users, without compromising user privacy. It uses fully homomorphic encryption (FHE) and noise injection to allow for these ads to be served. For more information, you can watch our team's video. This project
-is a submission to TikTok TechJam 2024. 
+is a submission to TikTok TechJam 2024 to address Problem Statement 1: Innovating Privacy. 
 
 
 ### Built With
