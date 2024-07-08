@@ -144,7 +144,7 @@ This proof of concept was tested on Windows 11 and Ubuntu. It was also tested wi
 
 5. You view the logs on Docker Desktop for more information. 
 
-<!-- INSERT IMG OF DOCKER-->!
+<!-- INSERT IMG OF DOCKER-->
 
 ![alt text](docs/images/docker_logs.png)
 
