@@ -45,13 +45,13 @@ is a submission to TikTok TechJam 2024.
 - ConcreteML
 - Flask
 - NTLK
+- Docker
 - Sklearn
 - Torch
 - Pandas
 - numpy
 - requests
 - shutil
-
 
 
 <!-- METHODOLOGY -->
@@ -95,6 +95,8 @@ Docker desktop is required to run the application.
 Download Docker at [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
 
 We recommend having at least 6GB of Disk Space and 4GB of RAM.
+
+This proof of concept was tested on Windows 11 and Ubuntu. It was also tested with Firefox, Google Chrome, and Microsoft Edge. If you face any issues, please free to let us know.
 
 ### Installation
 
