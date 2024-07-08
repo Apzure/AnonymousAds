@@ -136,7 +136,7 @@ This proof of concept was tested on Windows 11 and Ubuntu. It was also tested wi
 
 ![alt text](docs/images/query_page_with_ads.png)
 
-4. You can view your past queries by clicking on the HISTORY icon. Click on the same icon to hide your history.
+4. You can view your past queries by clicking on the history icon on the top left corner. Click on the same icon to hide your history.
 
 <!-- INSERT SCREENSHOT OF QUERY PAGE HERE + ADS + HISTORY-->
 
