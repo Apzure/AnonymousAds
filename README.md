@@ -188,7 +188,7 @@ As described in the methodology above, the `server.zip` and `client.zip` files a
 6. Replace the respective zip files in `search-engine/fhe` and `server/fhe`
 7. Run `docker compose up --build` again, and the model is now the newly trained model!
 
-## Ad Selection 
+## Note on Ad Selection 
 
 Note that we have chosen to display top 2 ads from 2 different categories. This means that if the user has searches that only focuses on one category e.g. sports, which normally only occurs with low quantites of searches, one of the ads may be relatively untargeted.
 
