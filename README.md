@@ -94,7 +94,7 @@ Docker desktop is required to run the application.
 
 Download Docker at [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
 
-We recommend having at least 6GB of Disk Space and 2GB of RAM.
+We recommend having at least 6GB of Disk Space and 4GB of RAM.
 
 ### Installation
 
