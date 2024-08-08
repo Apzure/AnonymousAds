@@ -23,7 +23,7 @@ def send_search_history():
     init_keywords()
     send_key_to_server()
     search_history_vector = process_search_history(search_history) 
-    logging.info("Successfully processed search history")
+    # logging.info("Successfully processed search history")
     prediction = send_search_history_to_server(search_history_vector)
     return jsonify(prediction), 200
 
@@ -60,17 +60,22 @@ def send_ads():
     logging.info(f"Total ads selected (including noisy): {len(ads)}")
     
     imageURLs = [f"http://server:5001/image/{cat}_1.jpg" for cat in ads]
-    for url in imageURLs:
+    for i, url in enumerate(imageURLs):
         try:
+            logging.info(f"Retrieving image for {ads[i]}")
             response = requests.get(url)
             response.raise_for_status()
-            logging.info(f"Successfully retrieved image: {url}")
+            # logging.info(f"Successfully retrieved image: {url}")
         except requests.exceptions.RequestException as e:
             logging.error(f"Error getting image {url}: {str(e)}")
     
     goodImageURLs = [f"http://localhost:5001/image/{cat}_1.jpg" for cat in good_ads]
-    logging.info(f"Returning {len(goodImageURLs)} good image URLs")
+    logging.info(f"Displaying {len(goodImageURLs)} genuine advertisements")
     
     logging.info("Completed send_ads process")
+    logging.info("-" * 30)
+    logging.info("-" * 30)
+    logging.info("-" * 30)
+    logging.info("-" * 30)
     logging.info("-" * 30)
     return jsonify(goodImageURLs), 200

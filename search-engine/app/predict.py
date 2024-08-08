@@ -32,7 +32,7 @@ def write_prediction(new_prediction):
     try:
         with open(PREDICT_FILENAME, 'wb+') as file:
             pickle.dump(new_prediction, file)
-        logger.info(f"Prediction file '{PREDICT_FILENAME}' has been written to.")
+        # logger.info(f"Prediction file '{PREDICT_FILENAME}' has been written to.")
     except FileNotFoundError:
         logger.error(f"Prediction file '{PREDICT_FILENAME}' not found")
         raise
@@ -48,8 +48,9 @@ def get_new_prediction(curr_pred):
     logger.info(f"Total predictions: {num_req_made}")
     if old_pred_exists(curr_pred) and num_req_made != 1:
         old_pred = read_pred()
-        logger.info("OLD PRED: %s", old_pred)
-        logger.info("CURR PRED: %s", curr_pred)
+        logger.info("Old Predictions:")
+        display_predictions(old_pred)
+        # logger.info("CURR PRED: %s", curr_pred)
         weight = 1 / (num_req_made + 1)
         for key in old_pred:
             curr_pred[key] += (1 - weight) * old_pred[key] + weight * curr_pred[key]

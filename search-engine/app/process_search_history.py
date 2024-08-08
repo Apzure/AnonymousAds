@@ -36,8 +36,8 @@ def is_keywords_got():
     
 def get_keywords_if_not_got():
     if is_keywords_got():
-        logger.info("Keywords have already been retrieved. Skipping.")
-        logger.info("-" * 30)  
+        # logger.info("Keywords have already been retrieved. Skipping.")
+        # logger.info("-" * 30)  
         return
 
     endpoint = f"{SERVER_ADDRESS}/get_keywords"
@@ -58,16 +58,16 @@ def get_keywords_if_not_got():
         logger.error(f"Failed to connect to server: {e}")
         
 def process_keywords():
-    logger.info("Starting to process keywords into stemmed_keywords")
+    # logger.info("Starting to process keywords into stemmed_keywords")
     with open(KEYWORDS_FILENAME, 'r') as file:
         keywords = json.load(file)
     stemmed_keywords = list(map(STEMMER.stem, keywords))
-    logger.info("Stemmed_keywords have been processed: %s", stemmed_keywords)
+    # logger.info("Stemmed_keywords have been processed: %s", stemmed_keywords)
     with open(STEMMED_KEYWORDS_FILENAME, 'w') as file:
         json.dump(stemmed_keywords, file)
-    logger.info(f"Stemmed Keywords file '{STEMMED_KEYWORDS_FILENAME}' has been created and written to.")    
-    logger.info("Succesfully processed keywords into stemmed_keywords")
-    logger.info("-" * 30)  
+    # logger.info(f"Stemmed Keywords file '{STEMMED_KEYWORDS_FILENAME}' has been created and written to.")    
+    # logger.info("Succesfully processed keywords into stemmed_keywords")
+    # logger.info("-" * 30)  
 
 # Converts search history to encrypted normalized vector
 def process_search_history(search_history): 
@@ -78,21 +78,21 @@ def process_search_history(search_history):
         
         with open(STEMMED_KEYWORDS_FILENAME, 'r') as file:
             stemmed_keywords = json.load(file)
-        logger.info("Retrieved %d stemmed keywords from file", len(stemmed_keywords))
+        # logger.info("Retrieved %d stemmed keywords from file", len(stemmed_keywords))
         
-        logger.debug("Preprocessing text: removing hyphens, applying regex, and converting to lowercase")
+        logger.info("Preprocessing text: removing hyphens, applying regex, and converting to lowercase")
         text = text.replace("-", " ")
         text = REGEX.sub('', text)
         text = text.lower()
         
-        logger.debug("Tokenizing and stemming text")
+        logger.info("Tokenizing and stemming text")
         text = text.split()
         text = list(map(STEMMER.stem, text))
         
-        logger.debug("Calculating word frequencies")
+        logger.info("Calculating word frequencies")
         freq = Counter(text)
         
-        logger.debug("Creating vector based on stemmed keywords")
+        logger.info("Creating vector based on stemmed keywords")
         vector = [freq[category] for category in stemmed_keywords]
         
         logger.info("Normalizing vector")
@@ -103,7 +103,7 @@ def process_search_history(search_history):
         encrypted_vector = client.quantize_encrypt_serialize(normalized_vector)
         logger.info("Encryption complete. Encrypted vector size: %d bytes", len(encrypted_vector))
         
-        logging.info("Successfully processed search history")
+        logger.info("Successfully processed search history")
         logger.info("-" * 30)  
         return encrypted_vector
     except Exception as e:

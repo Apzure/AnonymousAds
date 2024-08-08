@@ -16,10 +16,12 @@ SERVER_ADDRESS = "http://server:5001/"
 def send_key_to_server():
     endpoint = f"{SERVER_ADDRESS}/recieve_public_key"
     headers = {'Content-Type': 'application/octet-stream'}
+    logger.info("Generating public key")
     key = generate_key()
     payload = pickle.dumps(key)
     
     try:
+        logger.info("Sending public key to server")
         response = requests.post(endpoint, data=payload, headers=headers)
         response.raise_for_status()  # Raises an HTTPError for bad responses
         logger.info("Key generated and sent successfully to server")
